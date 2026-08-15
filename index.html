@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Sarra - Eclipse 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     1. DESIGN TOKENS & CORE RESET
+  ============================================ */
+  :root {
+    --void: #05020a;        
+    --void-mid: #0c0414;    
+    --void-deep: #150624;   
+    --charcoal: #121016;    
+    --corona: #f2c879;      
+    --ember: #ff8a5b;       
+    --moon: #17161c;        
+    --starlight: #eef0f7;   
+    --muted: #8f8a97;       
+    --hairline: rgba(238, 240, 247, 0.09);
+  }
+
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+  }
+
+  html { 
+    scroll-behavior: smooth; 
+    width: 100%;
+    overflow-x: hidden;
+    background-color: var(--charcoal); /* Base fallback */
+  }
+
+  body {
+    color: var(--starlight);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  ::selection { 
+    background: var(--corona); 
+    color: var(--void); 
+  }
+
+  /* ============================================
+     2. FIXED BACKGROUND 3D PARALLAX STARFIELD
+     Now sits safely at z-index: 0, with content safely 
+     layered above it at z-index: 10. No invisible bugs!
+  ============================================ */
+  .sky-parallax-container {
+    position: fixed;
+    top: -10vh;
+    left: -10vw;
+    width: 120vw;
+    height: 120vh;
+    background: linear-gradient(135deg, var(--void) 0%, var(--void-mid) 60%, var(--void-deep) 100%);
+    overflow: hidden;
+    z-index: 0; 
+    pointer-events: none;
+    perspective: 1000px;
+  }
+
+  .parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: transform;
+  }
+
+  .layer-background { transform: translate(calc(var(--mx, 0) * 12px), calc(var(--my, 0) * 12px)); }
+  .layer-midground { transform: translate(calc(var(--mx, 0) * 28px), calc(var(--my, 0) * 28px)); }
+  .layer-foreground { transform: translate(calc(var(--mx, 0) * 48px), calc(var(--my, 0) * 48px)); }
+
+  .star-base {
+    position: absolute;
+    background-color: #ffffff;
+    clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
+  }
+  
+  .star-size-tiny { width: 3px; height: 3px; }
+  .star-size-capped { width: 6px; height: 6px; }
+
+  .anim-fast-flicker { animation: renderFastFlicker 0.33s infinite ease-in-out; }
+  .anim-slow-glow { animation: renderSlowGlow 1.5s infinite ease-in-out; }
+
+  @keyframes renderFastFlicker {
+    0%, 100% { opacity: 0.12; transform: scale(0.65); filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.4)); }
+    50% { opacity: 1.0; transform: scale(1.15); filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.95)); }
+  }
+
+  @keyframes renderSlowGlow {
+    0%, 100% { opacity: 0.25; transform: scale(0.75); filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.35)); }
+    50% { opacity: 0.95; transform: scale(1.0); filter: drop-shadow(0 0 4.5px rgba(255, 255, 255, 0.85)); }
+  }
+
+  /* Extracted Hardcoded Positional Indices */
+  .pos-1  { top: 15%; left: 12%;  animation-delay: 0.05s; }
+  .pos-2  { top: 22%; left: 45%;  animation-delay: 0.18s; }
+  .pos-3  { top: 12%; left: 78%;  animation-delay: 0.31s; }
+  .pos-4  { top: 38%; left: 23%;  animation-delay: 0.09s; }
+  .pos-5  { top: 48%; left: 88%;  animation-delay: 0.22s; }
+  .pos-6  { top: 52%; left: 15%;  animation-delay: 0.44s; }
+  .pos-7  { top: 68%; left: 42%;  animation-delay: 0.11s; }
+  .pos-8  { top: 62%; left: 76%;  animation-delay: 0.27s; }
+  .pos-9  { top: 85%; left: 19%;  animation-delay: 0.03s; }
+  .pos-10 { top: 78%; left: 91%;  animation-delay: 0.36s; }
+  .pos-11 { top: 29%; left: 64%;  animation-delay: 0.15s; }
+  .pos-12 { top: 88%; left: 53%;  animation-delay: 0.52s; }
+  .pos-13 { top: 41%; left: 3%;   animation-delay: 0.21s; }
+  .pos-14 { top: 93%; left: 72%;  animation-delay: 0.07s; }
+  .pos-15 { top: 5%;  left: 37%;  animation-delay: 0.41s; }
+
+  /* ============================================
+     3. MAIN FOREGROUND CONTENT WRAPPER
+  ============================================ */
+  .site-content {
+    position: relative;
+    z-index: 10; /* Strictly above the stars */
+  }
+
+  .hero-wrap {
+    position: relative;
+    height: 175vh;
+  }
+
+  .hero-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Transparent so the starfield canvas peers through beautifully */
+    background: transparent; 
+  }
+
+  .eclipse-system {
+    position: relative;
+    width: min(42vmin, 320px);
+    height: min(42vmin, 320px);
+    margin-bottom: clamp(28px, 5vh, 52px);
+  }
+
+  .corona {
+    position: absolute;
+    inset: -20%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--corona) 0%, rgba(242, 200, 121, 0.45) 32%, rgba(242, 200, 121, 0) 68%);
+    filter: blur(3px);
+    /* Fades in smoothly as you scroll */
+    opacity: calc(var(--progress, 0) * 0.85); 
+    will-change: opacity;
+  }
+
+  .sun {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #ffdca0, var(--corona) 70%);
+  }
+
+  .flash {
+    position: absolute;
+    left: -6%;
+    top: 50%;
+    width: 16%;
+    height: 16%;
+    border-radius: 50%;
+    background: var(--starlight);
+    box-shadow: 0 0 24px 8px var(--ember);
+    transform: translateY(-50%);
+    opacity: var(--flash, 0); 
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  .moon {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 32%, #232028, var(--moon) 70%);
+    will-change: transform;
+  }
+
+  .hero-text {
+    text-align: center;
+    padding: 0 24px;
+    opacity: calc(1 - var(--progress, 0) * 1.6);
+    will-change: opacity;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.35em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .title {
+    font-family: 'Italiana', serif;
+    font-size: clamp(3rem, 11vw, 6.5rem);
+    letter-spacing: 0.08em;
+    line-height: 1;
+    color: var(--starlight);
+  }
+
+  .tagline {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: calc(1 - var(--progress, 0) * 6);
+    color: var(--muted);
+  }
+
+  .scroll-cue span {
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .scroll-cue .line {
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(var(--muted), transparent);
+    animation: dropline 1.8s ease-in-out infinite;
+  }
+
+  @keyframes dropline {
+    0%, 100% { transform: scaleY(0.3); transform-origin: top; opacity: 0.4; }
+    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  }
+
+  /* ============================================
+     4. GALLERY (Covers stars completely when reached)
+  ============================================ */
+
+  .gallery {
+    background: var(--charcoal);
+    padding: clamp(60px, 10vh, 110px) clamp(20px, 5vw, 48px) 40px;
+  }
+
+  .duo {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 48px) clamp(40px, 8vh, 76px);
+    display: flex;
+    gap: 22px;
+  }
+
+  .duo .frame { flex: 1; margin-bottom: 0; }
+  .duo .frame.mirror { transform: translateY(24px) scaleX(-1); }
+  .duo .frame.mirror.visible { transform: translateY(0) scaleX(-1); }
+
+  .gallery-grid {
+    columns: 3 300px;
+    column-gap: 22px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .frame {
+    break-inside: avoid;
+    margin-bottom: 22px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #1a1720;
+    border: 1px solid var(--hairline);
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .frame.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: zoom-in;
+  }
+
+  .frame:not(.frame--empty):hover {
+    border-color: rgba(242, 200, 121, 0.4);
+    box-shadow: 0 0 0 1px rgba(242, 200, 121, 0.15), 0 18px 40px rgba(0, 0, 0, 0.45);
+    transform: translateY(-3px);
+  }
+
+  .frame--empty {
+    aspect-ratio: var(--ar, 3/4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--muted);
+    border-style: dashed;
+  }
+  .frame--empty svg { opacity: 0.5; }
+  .frame--empty span { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; }
+
+  footer {
+    background: var(--charcoal);
+    display: flex;
+    justify-content: center;
+    padding: 60px 24px 80px;
+  }
+
+  /* ============================================
+     5. LIGHTBOX OVERLAY
+  ============================================ */
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 8, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 100;
+    padding: 40px;
+  }
+
+  .lightbox.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .lightbox img {
+    max-width: 100%;
+    max-height: 82vh;
+    border-radius: 6px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  }
+
+  .lightbox figcaption {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .lightbox-close, .lightbox-prev, .lightbox-next {
+    position: absolute;
+    background: transparent;
+    border: none;
+    color: var(--starlight);
+    font-family: 'Jost', sans-serif;
+    font-size: 1.6rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .lightbox-close:hover, .lightbox-prev:hover, .lightbox-next:hover { opacity: 1; }
+  .lightbox-close { top: 24px; right: 32px; font-size: 1.8rem; }
+  .lightbox-prev { left: clamp(12px, 3vw, 40px); top: 50%; transform: translateY(-50%); font-size: 2.4rem; }
+  .lightbox-next { right: clamp(12px, 3vw, 40px); top: 50%; transform: translateY(-50%); font-size: 2.4rem; }
+
+  @media (max-width: 640px) {
+    .duo { flex-direction: column; }
+    .gallery-grid { columns: 1 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .sky-parallax-container { display: none; }
+    .hero-sticky { background: var(--void); }
+    .corona, .flash, .hero-text, .scroll-cue { opacity: 1 !important; transform: none !important; }
+    .moon { transform: translate3d(0, 0, 0) !important; }
+    .frame { opacity: 1 !important; transform: none !important; transition: none; }
+    .scroll-cue .line { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- LAYER 1: STRICT PARALLAX BACKGROUND -->
+  <div class="sky-parallax-container">
+      <div class="parallax-layer layer-background">
+          <div class="star-base star-size-capped anim-slow-glow pos-1"></div>
+          <div class="star-base star-size-tiny anim-fast-flicker pos-2"></div>
+          <div class="star-base star-size-capped anim-slow-glow pos-5"></div>
+          <div class="star-base star-size-tiny anim-fast-flicker pos-8"></div>
+          <div class="star-base star-size-capped anim-slow-glow pos-11"></div>
+      </div>
+      <div class="parallax-layer layer-midground">
+          <div class="star-base star-size-tiny anim-fast-flicker pos-3"></div>
+          <div class="star-base star-size-capped anim-slow-glow pos-6"></div>
+          <div class="star-base star-size-tiny anim-fast-flicker pos-9"></div>
+          <div class="star-base star-size-capped anim-slow-glow pos-12"></div>
+          <div class="star-base star-size-tiny anim-fast-flicker pos-14"></div>
+      </div>
+      <div class="parallax-layer layer-foreground">
+          <div class="star-base star-size-capped anim-slow-glow pos-4"></div>
+          <div class="star-base star-size-tiny anim-fast-flicker pos-7"></div>
+          <div class="star-base star-size-capped anim-slow-glow pos-10"></div>
+          <div class="star-base star-size-tiny anim-fast-flicker pos-13"></div>
+          <div class="star-base star-size-capped anim-slow-glow pos-15"></div>
+      </div>
+  </div>
+
+  <!-- LAYER 2: FOREGROUND CONTENT WRAPPER -->
+  <main class="site-content">
+    
+    <section class="hero-wrap" id="heroWrap">
+      <div class="hero-sticky" id="heroSticky">
+        <div class="eclipse-system">
+          <div class="corona"></div>
+          <div class="sun"></div>
+          <div class="flash"></div>
+          <div class="moon" id="moon"></div>
+        </div>
+        <div class="hero-text">
+          <p class="eyebrow">Iceland &middot; 2026</p>
+          <h1 class="title">Sarra</h1>
+          <p class="tagline">totality, and everything after</p>
+        </div>
+        <div class="scroll-cue">
+          <span>Scroll</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="gallery" style="padding-bottom:0">
+      <div class="duo">
+        <div class="frame"><img src="images/duo-left.jpg" alt="" loading="lazy"></div>
+        <div class="frame mirror"><img src="images/duo-right.jpg" alt="" loading="lazy"></div>
+      </div>
+    </section>
+
+    <section class="gallery">
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+
+    <footer>
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="11.5" stroke="#8f8a97" stroke-width="1"/>
+        <circle cx="13" cy="13" r="6" fill="#8f8a97"/>
+      </svg>
+    </footer>
+
+  </main>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lbClose" aria-label="Close">&times;</button>
+    <button class="lightbox-prev" id="lbPrev" aria-label="Previous photo">&lsaquo;</button>
+    <figure>
+      <img id="lbImg" src="" alt="">
+      <figcaption id="lbCaption"></figcaption>
+    </figure>
+    <button class="lightbox-next" id="lbNext" aria-label="Next photo">&rsaquo;</button>
+  </div>
+
+<script>
+  /* ============================================
+     PHOTO CONFIGURATION
+  ============================================ */
+  const photos = [
+    { src: "images/photo-01.jpg", caption: "" },
+    { src: "images/photo-02.jpg", caption: "" },
+    { src: "images/photo-03.jpg", caption: "" },
+    { src: "images/photo-04.jpg", caption: "" },
+    { src: "images/photo-05.jpg", caption: "" },
+    { src: "images/photo-06.jpg", caption: "" },
+    { src: "images/photo-07.jpg", caption: "" },
+    { src: "images/photo-08.jpg", caption: "" },
+    { src: "images/photo-09.jpg", caption: "" },
+    { src: "images/photo-10.jpg", caption: "" },
+    { src: "images/photo-11.jpg", caption: "" },
+    { src: "images/photo-12.jpg", caption: "" },
+    { src: "images/photo-13.jpg", caption: "" },
+    { src: "images/photo-14.jpg", caption: "" },
+    { src: "images/photo-15.jpg", caption: "" },
+    { src: "images/photo-16.jpg", caption: "" },
+    { src: "images/photo-17.jpg", caption: "" },
+    { src: "images/photo-18.jpg", caption: "" }
+  ];
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============================================
+     MOUSE PARALLAX TRACKER
+  ============================================ */
+  let pTicking = false;
+  if (!reduceMotion) {
+    document.addEventListener('mousemove', (e) => {
+      if (!pTicking) {
+        window.requestAnimationFrame(() => {
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+          const moveX = (e.clientX - centerX) / centerX;
+          const moveY = (e.clientY - centerY) / centerY;
+          const container = document.querySelector('.sky-parallax-container');
+          
+          if(container) {
+            container.style.setProperty('--mx', moveX);
+            container.style.setProperty('--my', moveY);
+          }
+          pTicking = false;
+        });
+        pTicking = true;
+      }
+    });
+  }
+
+  /* ============================================
+     ECLIPSE SCROLL LOGIC
+  ============================================ */
+  const heroWrap = document.getElementById('heroWrap');
+  const root = document.documentElement;
+  const moon = document.getElementById('moon');
+  let sTicking = false;
+
+  function updateEclipse() {
+    sTicking = false;
+    if (reduceMotion) return;
+    
+    const rect = heroWrap.getBoundingClientRect();
+    const total = heroWrap.offsetHeight - window.innerHeight;
+    
+    // Overall scroll progression down the sticky section
+    let progress = total > 0 ? -rect.top / total : 0;
+    progress = Math.min(1, Math.max(0, progress));
+    
+    // Moon animation mapped to complete at 85% scroll for a brief pure-totality pause
+    let moonProgress = Math.min(1, progress / 0.85);
+    
+    // Setup opacity variables for CSS 
+    root.style.setProperty('--progress', progress.toFixed(4));
+    
+    // The diamond ring flash peaks right before totality is complete (around 82%)
+    const flash = Math.max(0, 1 - Math.abs(progress - 0.82) / 0.08);
+    root.style.setProperty('--flash', flash.toFixed(3));
+
+    // Calculate maximum X offset depending on viewport width and dynamically apply transform
+    const maxOffset = window.innerWidth <= 640 ? 120 : 230;
+    const moonX = (1 - moonProgress) * maxOffset;
+    moon.style.transform = `translate3d(${moonX}px, 0, 0)`;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!sTicking) {
+      window.requestAnimationFrame(updateEclipse);
+      sTicking = true;
+    }
+  }, { passive: true });
+
+  // Initial trigger
+  updateEclipse();
+
+  /* ============================================
+     GALLERY & INTERSECTION OBSERVER
+  ============================================ */
+  const grid = document.getElementById('galleryGrid');
+  const aspects = ['3/4', '1/1', '4/5', '4/3', '2/3'];
+  const usingPlaceholders = photos.length === 0;
+  const items = usingPlaceholders ? Array.from({ length: 6 }, () => null) : photos;
+
+  items.forEach((photo, i) => {
+    const frame = document.createElement('div');
+    frame.className = 'frame' + (photo ? '' : ' frame--empty');
+
+    if (photo) {
+      const img = document.createElement('img');
+      img.src = photo.src;
+      img.alt = photo.caption || 'A photo';
+      img.loading = 'lazy';
+      frame.appendChild(img);
+      frame.addEventListener('click', () => openLightbox(i));
+    } else {
+      frame.style.setProperty('--ar', aspects[i % aspects.length]);
+      frame.innerHTML = `
+        <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
+          <circle cx="13" cy="13" r="11.5" stroke="#8f8a97" stroke-width="1"/>
+          <circle cx="13" cy="13" r="6" fill="#8f8a97"/>
+        </svg>
+        <span>awaiting</span>`;
+    }
+    grid.appendChild(frame);
+  });
+
+  if (reduceMotion) {
+    document.querySelectorAll('.frame').forEach(f => f.classList.add('visible'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.frame').forEach(f => io.observe(f));
+  }
+
+  /* ============================================
+     LIGHTBOX CONTROLLER
+  ============================================ */
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbCaption = document.getElementById('lbCaption');
+  const lbPrev = document.getElementById('lbPrev');
+  const lbNext = document.getElementById('lbNext');
+  let currentIndex = 0;
+
+  function openLightbox(index) {
+    if (usingPlaceholders) return;
+    currentIndex = index;
+    showPhoto();
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden', 'false');
+  }
+
+  function showPhoto() {
+    const p = photos[currentIndex];
+    lbImg.src = p.src;
+    lbImg.alt = p.caption || '';
+    lbCaption.textContent = p.caption || '';
+    const multi = photos.length > 1;
+    lbPrev.style.display = multi ? 'block' : 'none';
+    lbNext.style.display = multi ? 'block' : 'none';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden', 'true');
+  }
+
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+  lbPrev.addEventListener('click', () => { currentIndex = (currentIndex - 1 + photos.length) % photos.length; showPhoto(); });
+  lbNext.addEventListener('click', () => { currentIndex = (currentIndex + 1) % photos.length; showPhoto(); });
+
+  window.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lbPrev.click();
+    if (e.key === 'ArrowRight') lbNext.click();
+  });
+
+</script>
+</body>
+</html>
