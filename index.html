@@ -305,4 +305,555 @@
 
   @keyframes dropline {
     0%, 100% { transform: scaleY(0.3); transform-origin: top; opacity: 0.4; }
-    50% { transform: scaleY(1);
+    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  }
+
+  /* ============================================
+     6. GALLERY 
+  ============================================ */
+  .gallery {
+    background: transparent; 
+    padding: clamp(40px, 8vh, 80px) clamp(20px, 5vw, 48px) 40px;
+  }
+
+  .duo {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 5vw, 48px) clamp(40px, 8vh, 76px);
+    display: flex;
+    gap: 22px;
+  }
+
+  .duo .frame { flex: 1; margin-bottom: 0; }
+  .duo .frame.mirror { transform: translateY(24px) scaleX(-1); }
+  .duo .frame.mirror.visible { transform: translateY(0) scaleX(-1); }
+
+  .gallery-grid {
+    columns: 3 300px;
+    column-gap: 22px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .frame {
+    break-inside: avoid;
+    margin-bottom: 22px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #1a1720;
+    border: 1px solid var(--hairline);
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .frame.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: zoom-in;
+  }
+
+  .frame:not(.frame--empty):hover {
+    border-color: rgba(242, 200, 121, 0.4);
+    box-shadow: 0 0 0 1px rgba(242, 200, 121, 0.15), 0 18px 40px rgba(0, 0, 0, 0.45);
+    transform: translateY(-3px);
+  }
+
+  .frame--empty {
+    aspect-ratio: var(--ar, 3/4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--muted);
+    border-style: dashed;
+  }
+
+  .frame--empty svg { opacity: 0.5; }
+  .frame--empty span { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; }
+
+  footer {
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    padding: 60px 24px 80px;
+  }
+
+  /* ============================================
+     7. LIGHTBOX & ACCESSIBILITY
+  ============================================ */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.96);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 100;
+    padding: 40px;
+  }
+
+  .lightbox.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .lightbox img {
+    max-width: 100%;
+    max-height: 82vh;
+    border-radius: 6px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+  }
+
+  .lightbox figcaption {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .lightbox-close, .lightbox-prev, .lightbox-next {
+    position: absolute;
+    background: transparent;
+    border: none;
+    color: var(--starlight);
+    font-family: 'Jost', sans-serif;
+    font-size: 1.6rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .lightbox-close:hover, .lightbox-prev:hover, .lightbox-next:hover { opacity: 1; }
+  .lightbox-close { top: 24px; right: 32px; font-size: 1.8rem; }
+  .lightbox-prev { left: clamp(12px, 3vw, 40px); top: 50%; transform: translateY(-50%); font-size: 2.4rem; }
+  .lightbox-next { right: clamp(12px, 3vw, 40px); top: 50%; transform: translateY(-50%); font-size: 2.4rem; }
+
+  @media (max-width: 640px) {
+    .duo { flex-direction: column; }
+    .gallery-grid { columns: 1 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .parallax-layer { transition: none !important; transform: none !important; }
+    .star-glow-container { animation: none !important; opacity: 0.8 !important; }
+    .frame { transition: none !important; }
+    .scroll-cue .line { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- BACKGROUND PARALLAX LAYER CONTAINER -->
+  <div class="sky-parallax-container">
+      <div class="sky-light-overlay"></div>
+      <div class="parallax-layer layer-background"></div>
+      <div class="parallax-layer layer-midground"></div>
+      <div class="parallax-layer layer-foreground"></div>
+  </div>
+
+  <!-- FOREGROUND CONTENT WRAPPER -->
+  <main class="site-content">
+    
+    <!-- PHYSICS-ACCURATE LENS FLARE SYSTEM -->
+    <div class="flare-system" id="flareSystem">
+        <div class="flare-artifact flare-streak"></div>
+        <div class="flare-artifact flare-burst"></div>
+        <div class="flare-artifact flare-1"></div>
+        <div class="flare-artifact flare-2"></div>
+        <div class="flare-artifact flare-3"></div>
+        <div class="flare-artifact flare-4"></div>
+        <div class="flare-artifact flare-5"></div>
+        <div class="flare-artifact flare-6"></div>
+    </div>
+
+    <section class="hero-wrap" id="heroWrap">
+      <div class="hero-sticky" id="heroSticky">
+        <div class="eclipse-system">
+          
+          <!-- TIGHT SVG SUN -->
+          <svg class="sun-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="85%" stop-color="#ffffff" stop-opacity="1" />
+                <stop offset="90%" stop-color="#f2c879" stop-opacity="1" />
+                <stop offset="93%" stop-color="#ff8a5b" stop-opacity="0.9" />
+                <stop offset="96%" stop-color="#cc3300" stop-opacity="0.4" />
+                <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="50" fill="url(#sunGrad)"/>
+          </svg>
+
+          <!-- SVG MOON -->
+          <svg class="moon-svg" id="moon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+             <circle cx="50" cy="50" r="49" fill="#000000"/>
+             <!-- Faint rim light to create 3D spherical depth -->
+             <circle cx="49.5" cy="49.5" r="49" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+          </svg>
+          
+        </div>
+        
+        <div class="hero-text">
+          <p class="eyebrow">Iceland &middot; 2026</p>
+          <h1 class="title">Sarra</h1>
+          <p class="tagline">totality, and everything after</p>
+        </div>
+        
+        <div class="scroll-cue">
+          <span>Scroll</span>
+          <div class="line"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="gallery">
+      <div class="duo">
+        <div class="frame"><img src="images/duo-left.jpg" alt="" loading="lazy"></div>
+        <div class="frame mirror"><img src="images/duo-right.jpg" alt="" loading="lazy"></div>
+      </div>
+    </section>
+
+    <section class="gallery">
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+
+    <footer>
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="11.5" stroke="#8f8a97" stroke-width="1"/>
+        <circle cx="13" cy="13" r="6" fill="#8f8a97"/>
+      </svg>
+    </footer>
+
+  </main>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lbClose" aria-label="Close">&times;</button>
+    <button class="lightbox-prev" id="lbPrev" aria-label="Previous photo">&lsaquo;</button>
+    <figure>
+      <img id="lbImg" src="" alt="">
+      <figcaption id="lbCaption"></figcaption>
+    </figure>
+    <button class="lightbox-next" id="lbNext" aria-label="Next photo">&rsaquo;</button>
+  </div>
+
+<script>
+  /* ============================================
+     PHOTO CONFIGURATION
+  ============================================ */
+  const photos = [
+    { src: "images/photo-01.jpg", caption: "" },
+    { src: "images/photo-02.jpg", caption: "" },
+    { src: "images/photo-03.jpg", caption: "" },
+    { src: "images/photo-04.jpg", caption: "" },
+    { src: "images/photo-05.jpg", caption: "" },
+    { src: "images/photo-06.jpg", caption: "" },
+    { src: "images/photo-07.jpg", caption: "" },
+    { src: "images/photo-08.jpg", caption: "" },
+    { src: "images/photo-09.jpg", caption: "" },
+    { src: "images/photo-10.jpg", caption: "" },
+    { src: "images/photo-11.jpg", caption: "" },
+    { src: "images/photo-12.jpg", caption: "" },
+    { src: "images/photo-13.jpg", caption: "" },
+    { src: "images/photo-14.jpg", caption: "" },
+    { src: "images/photo-15.jpg", caption: "" },
+    { src: "images/photo-16.jpg", caption: "" },
+    { src: "images/photo-17.jpg", caption: "" },
+    { src: "images/photo-18.jpg", caption: "" }
+  ];
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============================================
+     DYNAMIC DENSITY STARFIELD & BRIDGES
+  ============================================ */
+  function buildStarfield() {
+    const densityMultiplier = Math.max(0.5, window.innerWidth / 900);
+    const isDesktop = window.innerWidth > 768;
+
+    const layers = [
+      { selector: '.layer-background', count: Math.floor(70 * densityMultiplier), sizeClass: 'star-size-capped', animClass: 'anim-slow-glow', bridges: Math.floor(15 * densityMultiplier) },
+      { selector: '.layer-midground', count: Math.floor(70 * densityMultiplier), sizeClass: 'star-size-tiny', animClass: 'anim-fast-flicker', bridges: Math.floor(10 * densityMultiplier) },
+      { selector: '.layer-foreground', count: Math.floor(35 * densityMultiplier), sizeClass: 'star-size-tiny', animClass: 'anim-fast-flicker', bridges: 0 }
+    ];
+
+    const starColors = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#e0ecff', '#ffebd6', '#ffd0b3'];
+
+    layers.forEach(layer => {
+      const container = document.querySelector(layer.selector);
+      if (!container) return;
+      
+      const frag = document.createDocumentFragment();
+      const coords = [];
+      
+      for (let i = 0; i < layer.count; i++) {
+        const starWrapper = document.createElement('div');
+        starWrapper.className = `star-glow-container ${layer.sizeClass} ${layer.animClass}`;
+        
+        const left = (Math.random() * 100);
+        const top = (Math.random() * 100);
+        const delay = (Math.random() * 4).toFixed(2);
+        const color = starColors[Math.floor(Math.random() * starColors.length)];
+        
+        // Explicitly setting drop-shadow in style blocks Samsung Dark Mode from overriding the color
+        starWrapper.style.cssText = `left: ${left.toFixed(2)}%; top: ${top.toFixed(2)}%; animation-delay: ${delay}s; filter: drop-shadow(0 0 5px ${color});`;
+        
+        const starCore = document.createElement('div');
+        starCore.className = 'star-refined';
+        // Force the core white so it pierces through the colored glow
+        starCore.style.backgroundColor = '#ffffff'; 
+        
+        starWrapper.appendChild(starCore);
+        frag.appendChild(starWrapper);
+        coords.push({x: left, y: top});
+      }
+      
+      if (layer.bridges > 0) {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; z-index: -1; pointer-events: none;';
+        
+        let drawnLines = 0;
+        for(let i = 0; i < coords.length; i++) {
+            for(let j = i + 1; j < coords.length; j++) {
+                let dx = coords[i].x - coords[j].x;
+                let dy = coords[i].y - coords[j].y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (dist > 3 && dist < 12 && Math.random() > 0.75) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    // Translating the stars via CSS -50% ensures these exact coordinates map directly to the star's center.
+                    line.setAttribute("x1", coords[i].x + "%");
+                    line.setAttribute("y1", coords[i].y + "%");
+                    line.setAttribute("x2", coords[j].x + "%");
+                    line.setAttribute("y2", coords[j].y + "%");
+                    line.setAttribute("stroke", "rgba(255, 255, 255, 0.15)");
+                    line.setAttribute("stroke-width", isDesktop ? "0.5" : "1");
+                    svg.appendChild(line);
+                    drawnLines++;
+                }
+                if (drawnLines >= layer.bridges) break;
+            }
+            if (drawnLines >= layer.bridges) break;
+        }
+        frag.appendChild(svg);
+      }
+      
+      container.appendChild(frag);
+    });
+  }
+  
+  buildStarfield();
+
+  /* ============================================
+     PARALLAX (MOUSE)
+  ============================================ */
+  let pTicking = false;
+  if (!reduceMotion) {
+    document.addEventListener('mousemove', (e) => {
+      if (!pTicking) {
+        window.requestAnimationFrame(() => {
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+          const moveX = (e.clientX - centerX) / centerX;
+          const moveY = (e.clientY - centerY) / centerY;
+          const container = document.querySelector('.sky-parallax-container');
+          
+          if(container) {
+            container.style.setProperty('--mx', moveX);
+            container.style.setProperty('--my', moveY);
+          }
+          pTicking = false;
+        });
+        pTicking = true;
+      }
+    });
+  }
+
+  /* ============================================
+     CINEMATIC ECLIPSE & LENS FLARE PHYSICS
+  ============================================ */
+  const root = document.documentElement;
+  const moon = document.getElementById('moon');
+  const heroWrap = document.getElementById('heroWrap');
+  let sTicking = false;
+
+  function updateEclipse() {
+    sTicking = false;
+    const scrollY = window.scrollY;
+    
+    // Send scroll value to CSS for mobile parallax tracking
+    root.style.setProperty('--scroll-y', scrollY);
+
+    if (reduceMotion) {
+      return; 
+    }
+    
+    // Mapping purely to the height of the hero container
+    const totalScroll = Math.max(1, heroWrap.offsetHeight - window.innerHeight);
+    const p = Math.min(1, Math.max(0, scrollY / totalScroll)); 
+    
+    const maxOffset = window.innerWidth <= 640 ? 120 : 250;
+    
+    // Moon starts at (0,0) resulting in Absolute Totality. 
+    // It slides smoothly to the right and slightly down to reveal the sun.
+    let moonX = p * maxOffset; 
+    let moonY = p * (maxOffset * 0.3); 
+
+    let flareOp = 0;
+    let bgFlare = 0;
+
+    // Phase 1: Diamond Ring burst as the moon cracks the sun edge (0% to 15%)
+    if (p > 0 && p < 0.15) {
+        flareOp = p / 0.15; 
+    } 
+    // Phase 2: Full Reveal (15% to 70%)
+    else if (p >= 0.15 && p < 0.7) {
+        flareOp = 1; 
+    } 
+    // Phase 3: Fade Out (70% to 100%) as we hit the gallery
+    else if (p >= 0.7) {
+        flareOp = Math.max(0, 1 - ((p - 0.7) / 0.3)); 
+    }
+    
+    bgFlare = flareOp * 0.9; 
+
+    // LENS PHYSICS: Track the sun relative to the viewport center.
+    // The sun itself is fixed inside .eclipse-system, but .eclipse-system moves UP as we scroll down.
+    const eclipseRect = document.querySelector('.eclipse-system').getBoundingClientRect();
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
+    
+    const sunCenterX = eclipseRect.left + eclipseRect.width / 2;
+    const sunCenterY = eclipseRect.top + eclipseRect.height / 2;
+    
+    // Distance from center of screen to the center of the sun
+    const lx = sunCenterX - viewportCenterX;
+    const ly = sunCenterY - viewportCenterY;
+
+    // Apply exact pixel values to CSS variables for perfectly accurate translation
+    root.style.setProperty('--flare-op', flareOp.toFixed(3));
+    root.style.setProperty('--bg-flare', bgFlare.toFixed(3));
+    root.style.setProperty('--lx', lx + 'px');
+    root.style.setProperty('--ly', ly + 'px');
+    
+    const textFade = Math.min(1, scrollY / 300);
+    root.style.setProperty('--fade-text', textFade.toFixed(3));
+    
+    moon.style.transform = `translate3d(${moonX}px, ${moonY}px, 0)`;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!sTicking) {
+      window.requestAnimationFrame(updateEclipse);
+      sTicking = true;
+    }
+  }, { passive: true });
+
+  // Execute immediately on load to set Totality state
+  updateEclipse();
+
+  /* ============================================
+     GALLERY INJECTION & INTERSECTION OBSERVER
+  ============================================ */
+  const grid = document.getElementById('galleryGrid');
+  const aspects = ['3/4', '1/1', '4/5', '4/3', '2/3'];
+  const usingPlaceholders = photos.length === 0;
+  const items = usingPlaceholders ? Array.from({ length: 6 }, () => null) : photos;
+
+  items.forEach((photo, i) => {
+    const frame = document.createElement('div');
+    frame.className = 'frame' + (photo ? '' : ' frame--empty');
+
+    if (photo) {
+      const img = document.createElement('img');
+      img.src = photo.src;
+      img.alt = photo.caption || 'A photo';
+      img.loading = 'lazy';
+      frame.appendChild(img);
+      frame.addEventListener('click', () => openLightbox(i));
+    } else {
+      frame.style.setProperty('--ar', aspects[i % aspects.length]);
+      frame.innerHTML = `
+        <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
+          <circle cx="13" cy="13" r="11.5" stroke="#8f8a97" stroke-width="1"/>
+          <circle cx="13" cy="13" r="6" fill="#8f8a97"/>
+        </svg>
+        <span>awaiting</span>`;
+    }
+    grid.appendChild(frame);
+  });
+
+  if (reduceMotion) {
+    document.querySelectorAll('.frame').forEach(f => f.classList.add('visible'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.frame').forEach(f => io.observe(f));
+  }
+
+  /* ============================================
+     LIGHTBOX CONTROLLER
+  ============================================ */
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbCaption = document.getElementById('lbCaption');
+  const lbPrev = document.getElementById('lbPrev');
+  const lbNext = document.getElementById('lbNext');
+  let currentIndex = 0;
+
+  function openLightbox(index) {
+    if (usingPlaceholders) return;
+    currentIndex = index;
+    showPhoto();
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden', 'false');
+  }
+
+  function showPhoto() {
+    const p = photos[currentIndex];
+    lbImg.src = p.src;
+    lbImg.alt = p.caption || '';
+    lbCaption.textContent = p.caption || '';
+    const multi = photos.length > 1;
+    lbPrev.style.display = multi ? 'block' : 'none';
+    lbNext.style.display = multi ? 'block' : 'none';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden', 'true');
+  }
+
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+  lbPrev.addEventListener('click', () => { currentIndex = (currentIndex - 1 + photos.length) % photos.length; showPhoto(); });
+  lbNext.addEventListener('click', () => { currentIndex = (currentIndex + 1) % photos.length; showPhoto(); });
+
+  window.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lbPrev.click();
+    if (e.key === 'ArrowRight') lbNext.click();
+  });
+
+</script>
+</body>
+</html>
