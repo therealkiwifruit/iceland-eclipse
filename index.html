@@ -19,7 +19,6 @@
     --charcoal: #121016;    
     --corona: #f2c879;      
     --ember: #ff8a5b;       
-    --moon: #17161c;        
     --starlight: #eef0f7;   
     --muted: #8f8a97;       
     --hairline: rgba(238, 240, 247, 0.09);
@@ -67,6 +66,20 @@
     perspective: 1000px;
   }
 
+  /* Subtly faded constellation grid layout overlay */
+  .sky-parallax-container::before {
+    content: "";
+    position: absolute;
+    inset: -20vw;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), 
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 80px 80px;
+    -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 65%);
+    mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 65%);
+    z-index: 0;
+  }
+
   .parallax-layer {
     position: absolute;
     top: 0;
@@ -75,32 +88,45 @@
     height: 100%;
     transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
     will-change: transform;
+    z-index: 1;
   }
 
-  .layer-background { transform: translate(calc(var(--mx, 0) * 12px), calc(var(--my, 0) * 12px)); }
-  .layer-midground { transform: translate(calc(var(--mx, 0) * 28px), calc(var(--my, 0) * 28px)); }
-  .layer-foreground { transform: translate(calc(var(--mx, 0) * 48px), calc(var(--my, 0) * 48px)); }
+  .layer-background { transform: translate3d(calc(var(--mx, 0) * 12px), calc(var(--my, 0) * 12px), 0); }
+  .layer-midground { transform: translate3d(calc(var(--mx, 0) * 28px), calc(var(--my, 0) * 28px), 0); }
+  .layer-foreground { transform: translate3d(calc(var(--mx, 0) * 48px), calc(var(--my, 0) * 48px), 0); }
 
-  .star-base {
+  /* 
+     STAR HALO BUG FIX: 
+     Parent container handles Drop Shadow + Animation to fix Webkit Clip-Path bug.
+     Using transforms over filter manipulation boosts rendering to 120fps.
+  */
+  .star-glow-container {
     position: absolute;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.85));
+  }
+
+  .star-refined {
+    width: 100%;
+    height: 100%;
     background-color: #ffffff;
     clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
   }
   
-  .star-size-tiny { width: 3px; height: 3px; }
-  .star-size-capped { width: 6px; height: 6px; }
+  .star-size-tiny { width: 3.5px; height: 3.5px; }
+  .star-size-capped { width: 7px; height: 7px; }
 
   .anim-fast-flicker { animation: renderFastFlicker 0.33s infinite ease-in-out; }
   .anim-slow-glow { animation: renderSlowGlow 1.5s infinite ease-in-out; }
 
   @keyframes renderFastFlicker {
-    0%, 100% { opacity: 0.12; transform: scale(0.65); filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.4)); }
-    50% { opacity: 1.0; transform: scale(1.15); filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.95)); }
+    0%, 100% { opacity: 0.15; transform: scale(0.65); }
+    50% { opacity: 1.0; transform: scale(1.15); }
   }
 
   @keyframes renderSlowGlow {
-    0%, 100% { opacity: 0.25; transform: scale(0.75); filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.35)); }
-    50% { opacity: 0.95; transform: scale(1.0); filter: drop-shadow(0 0 4.5px rgba(255, 255, 255, 0.85)); }
+    0%, 100% { opacity: 0.3; transform: scale(0.75); }
+    50% { opacity: 1.0; transform: scale(1.05); }
   }
 
   /* ============================================
@@ -120,7 +146,7 @@
     position: sticky;
     top: 0;
     height: 100vh;
-    width: 100%; /* Fixes centering issue on ultrawide monitors */
+    width: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -136,14 +162,14 @@
     margin-bottom: clamp(28px, 5vh, 52px);
   }
 
-  /* Solidified gradients to fix Samsung Internet rendering */
+  /* SAMSUNG INTERNET FIX: Explicit RGB color stops prevent the brown/black bug */
   .corona {
     position: absolute;
     inset: -20%;
     border-radius: 50%;
-    background: radial-gradient(circle, #f2c879 0%, rgba(242, 200, 121, 0.45) 32%, rgba(242, 200, 121, 0) 68%);
+    background: radial-gradient(circle, rgb(242, 200, 121) 0%, rgba(242, 200, 121, 0.45) 32%, rgba(242, 200, 121, 0) 68%);
     filter: blur(3px);
-    opacity: calc(1 - var(--progress, 0) * 0.85); /* Highly visible during totality, fades as you scroll */
+    opacity: var(--corona-op, 0); 
     will-change: opacity;
   }
 
@@ -151,19 +177,20 @@
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #ffffff 0%, #ffdca0 20%, #f2c879 70%, #ff8a5b 100%);
-    box-shadow: 0 0 30px rgba(242, 200, 121, 0.4);
+    background-color: rgb(255, 255, 255);
+    background-image: radial-gradient(circle at 40% 35%, rgb(255, 255, 255) 0%, rgb(255, 220, 160) 20%, rgb(242, 200, 121) 70%, rgb(255, 138, 91) 100%);
+    box-shadow: 0 0 35px rgba(242, 200, 121, 0.4);
   }
 
   .flash {
     position: absolute;
-    left: -6%;
-    top: 50%;
-    width: 16%;
-    height: 16%;
+    left: -4%;
+    top: 40%;
+    width: 15%;
+    height: 15%;
     border-radius: 50%;
     background: var(--starlight);
-    box-shadow: 0 0 24px 8px var(--ember);
+    box-shadow: 0 0 28px 10px var(--ember);
     transform: translateY(-50%);
     opacity: var(--flash, 0); 
     pointer-events: none;
@@ -172,17 +199,19 @@
 
   .moon {
     position: absolute;
-    inset: 0;
+    inset: -1px; /* Slight scaling overlap to prevent sun bleeding on edges */
     border-radius: 50%;
-    background-color: #17161c;
-    background: radial-gradient(circle at 35% 32%, #2c2933 0%, #17161c 70%);
+    background-color: rgb(23, 22, 28);
+    background-image: radial-gradient(circle at 35% 32%, rgb(44, 41, 51) 0%, rgb(23, 22, 28) 70%);
     will-change: transform;
+    /* Default position set for users with Javascript disabled */
+    transform: translate3d(0, 0, 0); 
   }
 
   .hero-text {
     text-align: center;
     padding: 0 24px;
-    opacity: calc(1 - var(--progress, 0) * 1.6);
+    opacity: calc(1 - var(--fade-text, 0));
     will-change: opacity;
   }
 
@@ -219,7 +248,7 @@
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    opacity: calc(1 - var(--progress, 0) * 6);
+    opacity: calc(1 - var(--fade-text, 0) * 3);
     color: var(--muted);
   }
 
@@ -385,11 +414,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    
-    /* Keep stars visible, but disable animation to respect OS settings */
     .parallax-layer { transition: none !important; transform: none !important; }
-    .star-base { animation: none !important; opacity: 0.8 !important; }
-    
+    .star-glow-container { animation: none !important; opacity: 0.8 !important; }
     .frame { transition: none !important; }
     .scroll-cue .line { animation: none !important; }
   }
@@ -486,8 +512,8 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ============================================
-     170-STAR DYNAMIC INJECTOR
-     Bypasses CSS variable bottlenecks for max performance
+     170-STAR NESTED DYNAMIC INJECTOR
+     Nests elements to fix the Clip-Path rendering bug.
   ============================================ */
   function buildStarfield(totalStars) {
     const layers = [
@@ -504,21 +530,27 @@
       const frag = document.createDocumentFragment();
       
       for (let i = 0; i < count; i++) {
-        const star = document.createElement('div');
-        star.className = `star-base ${layer.sizeClass} ${layer.animClass}`;
+        // Parent handles positioning, animation, and drop-shadow
+        const starWrapper = document.createElement('div');
+        starWrapper.className = `star-glow-container ${layer.sizeClass} ${layer.animClass}`;
         
         const left = (Math.random() * 100).toFixed(2);
         const top = (Math.random() * 100).toFixed(2);
-        const delay = (Math.random() * 2).toFixed(2); // Random offset for organic twinkling
+        const delay = (Math.random() * 2).toFixed(2);
         
-        star.style.cssText = `left: ${left}%; top: ${top}%; animation-delay: ${delay}s;`;
-        frag.appendChild(star);
+        starWrapper.style.cssText = `left: ${left}%; top: ${top}%; animation-delay: ${delay}s;`;
+        
+        // Child handles the shape and background color
+        const starCore = document.createElement('div');
+        starCore.className = 'star-refined';
+        
+        starWrapper.appendChild(starCore);
+        frag.appendChild(starWrapper);
       }
       container.appendChild(frag);
     });
   }
   
-  // Inject the dense starfield!
   buildStarfield(170);
 
   /* ============================================
@@ -547,34 +579,45 @@
   }
 
   /* ============================================
-     ECLIPSE SCROLL LOGIC
+     600px SCROLL ECLIPSE MECHANIC
   ============================================ */
-  const heroWrap = document.getElementById('heroWrap');
   const root = document.documentElement;
   const moon = document.getElementById('moon');
   let sTicking = false;
 
   function updateEclipse() {
     sTicking = false;
-    if (reduceMotion) return; // Freezes at perfectly centered totality 
+    if (reduceMotion) {
+      moon.style.transform = `translate3d(0%, 0%, 0)`; // Lock in totality
+      return; 
+    }
     
-    const rect = heroWrap.getBoundingClientRect();
-    const total = heroWrap.offsetHeight - window.innerHeight;
+    // Map scroll strictly over the first 600px of scrolling
+    const scrollY = window.scrollY;
+    const progress = Math.min(1, Math.max(0, scrollY / 600));
     
-    // progress maps from 0 (top of page) to 1 (scrolled past hero)
-    let progress = total > 0 ? -rect.top / total : 0;
-    progress = Math.min(1, Math.max(0, progress));
+    // At scroll=0, moon is top left (-120%, -40%). At scroll=600, moon is dead center (0, 0)
+    const moonX = -120 * (1 - progress);
+    const moonY = -40 * (1 - progress);
     
-    root.style.setProperty('--progress', progress.toFixed(4));
+    // Diamond Ring Flash peaks directly at 92% of the way to totality
+    let flash = 0;
+    if (progress > 0.8 && progress < 1.0) {
+       flash = Math.max(0, 1 - Math.abs(progress - 0.92) / 0.08);
+    }
     
-    // The "Diamond Ring" flash peaks exactly at 0.22 scroll progress
-    const flash = Math.max(0, 1 - Math.abs(progress - 0.22) / 0.16);
-    root.style.setProperty('--flash', flash.toFixed(3));
+    // Corona glows brighter as totality approaches
+    const coronaOpacity = progress * 0.95;
 
-    // Moon starts dead center, and slides to the right to reveal the sun
-    const maxOffset = window.innerWidth <= 640 ? 120 : 230;
-    const moonX = progress * maxOffset;
-    moon.style.transform = `translate3d(${moonX}px, 0, 0)`;
+    // Apply values
+    root.style.setProperty('--flash', flash.toFixed(3));
+    root.style.setProperty('--corona-op', coronaOpacity.toFixed(3));
+    
+    // Fade out text as we scroll down to let the image shine
+    const textFade = Math.min(1, scrollY / 300);
+    root.style.setProperty('--fade-text', textFade.toFixed(3));
+    
+    moon.style.transform = `translate3d(${moonX}%, ${moonY}%, 0)`;
   }
 
   window.addEventListener('scroll', () => {
@@ -584,7 +627,6 @@
     }
   }, { passive: true });
 
-  // Initial calculation to set totality on load
   updateEclipse();
 
   /* ============================================
