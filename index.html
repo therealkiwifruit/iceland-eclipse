@@ -35,7 +35,7 @@
     scroll-behavior: smooth; 
     width: 100%;
     overflow-x: hidden;
-    background-color: var(--charcoal); /* Base fallback */
+    background-color: var(--charcoal);
   }
 
   body {
@@ -53,8 +53,6 @@
 
   /* ============================================
      2. FIXED BACKGROUND 3D PARALLAX STARFIELD
-     Now sits safely at z-index: 0, with content safely 
-     layered above it at z-index: 10. No invisible bugs!
   ============================================ */
   .sky-parallax-container {
     position: fixed;
@@ -105,29 +103,12 @@
     50% { opacity: 0.95; transform: scale(1.0); filter: drop-shadow(0 0 4.5px rgba(255, 255, 255, 0.85)); }
   }
 
-  /* Extracted Hardcoded Positional Indices */
-  .pos-1  { top: 15%; left: 12%;  animation-delay: 0.05s; }
-  .pos-2  { top: 22%; left: 45%;  animation-delay: 0.18s; }
-  .pos-3  { top: 12%; left: 78%;  animation-delay: 0.31s; }
-  .pos-4  { top: 38%; left: 23%;  animation-delay: 0.09s; }
-  .pos-5  { top: 48%; left: 88%;  animation-delay: 0.22s; }
-  .pos-6  { top: 52%; left: 15%;  animation-delay: 0.44s; }
-  .pos-7  { top: 68%; left: 42%;  animation-delay: 0.11s; }
-  .pos-8  { top: 62%; left: 76%;  animation-delay: 0.27s; }
-  .pos-9  { top: 85%; left: 19%;  animation-delay: 0.03s; }
-  .pos-10 { top: 78%; left: 91%;  animation-delay: 0.36s; }
-  .pos-11 { top: 29%; left: 64%;  animation-delay: 0.15s; }
-  .pos-12 { top: 88%; left: 53%;  animation-delay: 0.52s; }
-  .pos-13 { top: 41%; left: 3%;   animation-delay: 0.21s; }
-  .pos-14 { top: 93%; left: 72%;  animation-delay: 0.07s; }
-  .pos-15 { top: 5%;  left: 37%;  animation-delay: 0.41s; }
-
   /* ============================================
      3. MAIN FOREGROUND CONTENT WRAPPER
   ============================================ */
   .site-content {
     position: relative;
-    z-index: 10; /* Strictly above the stars */
+    z-index: 10; 
   }
 
   .hero-wrap {
@@ -139,12 +120,12 @@
     position: sticky;
     top: 0;
     height: 100vh;
+    width: 100%; /* Fixes centering issue on ultrawide monitors */
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Transparent so the starfield canvas peers through beautifully */
     background: transparent; 
   }
 
@@ -155,14 +136,14 @@
     margin-bottom: clamp(28px, 5vh, 52px);
   }
 
+  /* Solidified gradients to fix Samsung Internet rendering */
   .corona {
     position: absolute;
     inset: -20%;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--corona) 0%, rgba(242, 200, 121, 0.45) 32%, rgba(242, 200, 121, 0) 68%);
+    background: radial-gradient(circle, #f2c879 0%, rgba(242, 200, 121, 0.45) 32%, rgba(242, 200, 121, 0) 68%);
     filter: blur(3px);
-    /* Fades in smoothly as you scroll */
-    opacity: calc(var(--progress, 0) * 0.85); 
+    opacity: calc(1 - var(--progress, 0) * 0.85); /* Highly visible during totality, fades as you scroll */
     will-change: opacity;
   }
 
@@ -170,7 +151,8 @@
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #ffdca0, var(--corona) 70%);
+    background: radial-gradient(circle at 40% 35%, #ffffff 0%, #ffdca0 20%, #f2c879 70%, #ff8a5b 100%);
+    box-shadow: 0 0 30px rgba(242, 200, 121, 0.4);
   }
 
   .flash {
@@ -192,7 +174,8 @@
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 32%, #232028, var(--moon) 70%);
+    background-color: #17161c;
+    background: radial-gradient(circle at 35% 32%, #2c2933 0%, #17161c 70%);
     will-change: transform;
   }
 
@@ -259,7 +242,7 @@
   }
 
   /* ============================================
-     4. GALLERY (Covers stars completely when reached)
+     4. GALLERY & CONTENT LAYERS
   ============================================ */
 
   .gallery {
@@ -326,6 +309,7 @@
     color: var(--muted);
     border-style: dashed;
   }
+
   .frame--empty svg { opacity: 0.5; }
   .frame--empty span { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; }
 
@@ -390,6 +374,10 @@
   .lightbox-prev { left: clamp(12px, 3vw, 40px); top: 50%; transform: translateY(-50%); font-size: 2.4rem; }
   .lightbox-next { right: clamp(12px, 3vw, 40px); top: 50%; transform: translateY(-50%); font-size: 2.4rem; }
 
+  /* ============================================
+     6. RESPONSIVE & ACCESSIBILITY
+  ============================================ */
+
   @media (max-width: 640px) {
     .duo { flex-direction: column; }
     .gallery-grid { columns: 1 100%; }
@@ -397,43 +385,26 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .sky-parallax-container { display: none; }
-    .hero-sticky { background: var(--void); }
-    .corona, .flash, .hero-text, .scroll-cue { opacity: 1 !important; transform: none !important; }
-    .moon { transform: translate3d(0, 0, 0) !important; }
-    .frame { opacity: 1 !important; transform: none !important; transition: none; }
-    .scroll-cue .line { animation: none; }
+    
+    /* Keep stars visible, but disable animation to respect OS settings */
+    .parallax-layer { transition: none !important; transform: none !important; }
+    .star-base { animation: none !important; opacity: 0.8 !important; }
+    
+    .frame { transition: none !important; }
+    .scroll-cue .line { animation: none !important; }
   }
 </style>
 </head>
 <body>
 
-  <!-- LAYER 1: STRICT PARALLAX BACKGROUND -->
+  <!-- BACKGROUND PARALLAX LAYER CONTAINER -->
   <div class="sky-parallax-container">
-      <div class="parallax-layer layer-background">
-          <div class="star-base star-size-capped anim-slow-glow pos-1"></div>
-          <div class="star-base star-size-tiny anim-fast-flicker pos-2"></div>
-          <div class="star-base star-size-capped anim-slow-glow pos-5"></div>
-          <div class="star-base star-size-tiny anim-fast-flicker pos-8"></div>
-          <div class="star-base star-size-capped anim-slow-glow pos-11"></div>
-      </div>
-      <div class="parallax-layer layer-midground">
-          <div class="star-base star-size-tiny anim-fast-flicker pos-3"></div>
-          <div class="star-base star-size-capped anim-slow-glow pos-6"></div>
-          <div class="star-base star-size-tiny anim-fast-flicker pos-9"></div>
-          <div class="star-base star-size-capped anim-slow-glow pos-12"></div>
-          <div class="star-base star-size-tiny anim-fast-flicker pos-14"></div>
-      </div>
-      <div class="parallax-layer layer-foreground">
-          <div class="star-base star-size-capped anim-slow-glow pos-4"></div>
-          <div class="star-base star-size-tiny anim-fast-flicker pos-7"></div>
-          <div class="star-base star-size-capped anim-slow-glow pos-10"></div>
-          <div class="star-base star-size-tiny anim-fast-flicker pos-13"></div>
-          <div class="star-base star-size-capped anim-slow-glow pos-15"></div>
-      </div>
+      <div class="parallax-layer layer-background"></div>
+      <div class="parallax-layer layer-midground"></div>
+      <div class="parallax-layer layer-foreground"></div>
   </div>
 
-  <!-- LAYER 2: FOREGROUND CONTENT WRAPPER -->
+  <!-- FOREGROUND CONTENT WRAPPER -->
   <main class="site-content">
     
     <section class="hero-wrap" id="heroWrap">
@@ -515,6 +486,42 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ============================================
+     170-STAR DYNAMIC INJECTOR
+     Bypasses CSS variable bottlenecks for max performance
+  ============================================ */
+  function buildStarfield(totalStars) {
+    const layers = [
+      { selector: '.layer-background', ratio: 0.4, sizeClass: 'star-size-capped', animClass: 'anim-slow-glow' },
+      { selector: '.layer-midground', ratio: 0.4, sizeClass: 'star-size-tiny', animClass: 'anim-fast-flicker' },
+      { selector: '.layer-foreground', ratio: 0.2, sizeClass: 'star-size-tiny', animClass: 'anim-fast-flicker' }
+    ];
+
+    layers.forEach(layer => {
+      const container = document.querySelector(layer.selector);
+      if (!container) return;
+      
+      const count = Math.floor(totalStars * layer.ratio);
+      const frag = document.createDocumentFragment();
+      
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        star.className = `star-base ${layer.sizeClass} ${layer.animClass}`;
+        
+        const left = (Math.random() * 100).toFixed(2);
+        const top = (Math.random() * 100).toFixed(2);
+        const delay = (Math.random() * 2).toFixed(2); // Random offset for organic twinkling
+        
+        star.style.cssText = `left: ${left}%; top: ${top}%; animation-delay: ${delay}s;`;
+        frag.appendChild(star);
+      }
+      container.appendChild(frag);
+    });
+  }
+  
+  // Inject the dense starfield!
+  buildStarfield(170);
+
+  /* ============================================
      MOUSE PARALLAX TRACKER
   ============================================ */
   let pTicking = false;
@@ -549,28 +556,24 @@
 
   function updateEclipse() {
     sTicking = false;
-    if (reduceMotion) return;
+    if (reduceMotion) return; // Freezes at perfectly centered totality 
     
     const rect = heroWrap.getBoundingClientRect();
     const total = heroWrap.offsetHeight - window.innerHeight;
     
-    // Overall scroll progression down the sticky section
+    // progress maps from 0 (top of page) to 1 (scrolled past hero)
     let progress = total > 0 ? -rect.top / total : 0;
     progress = Math.min(1, Math.max(0, progress));
     
-    // Moon animation mapped to complete at 85% scroll for a brief pure-totality pause
-    let moonProgress = Math.min(1, progress / 0.85);
-    
-    // Setup opacity variables for CSS 
     root.style.setProperty('--progress', progress.toFixed(4));
     
-    // The diamond ring flash peaks right before totality is complete (around 82%)
-    const flash = Math.max(0, 1 - Math.abs(progress - 0.82) / 0.08);
+    // The "Diamond Ring" flash peaks exactly at 0.22 scroll progress
+    const flash = Math.max(0, 1 - Math.abs(progress - 0.22) / 0.16);
     root.style.setProperty('--flash', flash.toFixed(3));
 
-    // Calculate maximum X offset depending on viewport width and dynamically apply transform
+    // Moon starts dead center, and slides to the right to reveal the sun
     const maxOffset = window.innerWidth <= 640 ? 120 : 230;
-    const moonX = (1 - moonProgress) * maxOffset;
+    const moonX = progress * maxOffset;
     moon.style.transform = `translate3d(${moonX}px, 0, 0)`;
   }
 
@@ -581,11 +584,11 @@
     }
   }, { passive: true });
 
-  // Initial trigger
+  // Initial calculation to set totality on load
   updateEclipse();
 
   /* ============================================
-     GALLERY & INTERSECTION OBSERVER
+     GALLERY INJECTION & INTERSECTION OBSERVER
   ============================================ */
   const grid = document.getElementById('galleryGrid');
   const aspects = ['3/4', '1/1', '4/5', '4/3', '2/3'];
