@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- STRICT DARK MODE ENFORCEMENT: Prevents Samsung Internet from inverting colors -->
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
 <meta name="robots" content="noindex, nofollow">
 <title>Sarra - Eclipse 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +16,10 @@
      1. DESIGN TOKENS & CORE RESET
   ============================================ */
   :root {
+    color-scheme: dark; /* Double enforcement for WebKit engines */
     --void: #000000;        
+    --corona: #f2c879;      
+    --ember: #ff8a5b;       
     --starlight: #eef0f7;   
     --muted: #8f8a97;       
     --hairline: rgba(238, 240, 247, 0.12);
@@ -40,6 +46,11 @@
     min-height: 100vh;
   }
 
+  ::selection { 
+    background: var(--corona); 
+    color: var(--void); 
+  }
+
   /* ============================================
      2. DYNAMIC PARALLAX SKY BACKGROUND
   ============================================ */
@@ -49,19 +60,19 @@
     left: -10vw;
     width: 120vw;
     height: 130vh;
-    background-color: var(--void); /* Starts Pitch Black */
+    background-color: var(--void); /* Pitch Black Start */
     overflow: hidden;
     z-index: 0; 
     pointer-events: none;
     perspective: 1000px;
   }
 
-  /* Dynamic Purple Sky Glow - Fades in as Sun is revealed */
   .sky-light-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(20, 10, 50, 0.95) 0%, rgba(35, 15, 60, 0.6) 60%, transparent 100%);
-    opacity: var(--bg-flare, 0); /* Starts at 0 (pitch black) */
+    /* Deep purple glow that fades in with the lens flare */
+    background: linear-gradient(135deg, rgba(30, 15, 65, 0.9) 0%, rgba(20, 5, 35, 0.5) 60%, transparent 100%);
+    opacity: var(--bg-flare, 0); 
     will-change: opacity;
     z-index: 0;
   }
@@ -77,25 +88,26 @@
     z-index: 1;
   }
 
+  /* Incorporates Scroll-Y for mobile parallax without a mouse */
   .layer-background { transform: translate3d(calc(var(--mx, 0) * 10px), calc(var(--my, 0) * 10px - var(--scroll-y, 0) * 0.05px), 0); }
   .layer-midground { transform: translate3d(calc(var(--mx, 0) * 25px), calc(var(--my, 0) * 25px - var(--scroll-y, 0) * 0.15px), 0); }
   .layer-foreground { transform: translate3d(calc(var(--mx, 0) * 45px), calc(var(--my, 0) * 45px - var(--scroll-y, 0) * 0.35px), 0); }
 
   /* 
      STAR REFINEMENT: 
-     Brighter cores with dynamic inherited glows.
+     Wrapper applies the colored drop-shadow. 
+     Inner core is intensely white to look sharp and bright.
   */
   .star-glow-container {
     position: absolute;
     will-change: transform, opacity;
-    filter: drop-shadow(0 0 5px currentColor);
   }
 
   .star-refined {
     width: 100%;
     height: 100%;
     background-color: #ffffff; 
-    box-shadow: 0 0 2px #ffffff; /* Intense piercing white core */
+    box-shadow: 0 0 2px #ffffff;
     clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
   }
   
@@ -123,10 +135,9 @@
     z-index: 10; 
   }
 
-  /* Tightened hero wrapper to remove dead scroll space */
   .hero-wrap {
     position: relative;
-    height: 130vh;
+    height: 120vh; /* Reduced to eliminate the massive gap before gallery */
   }
 
   .hero-sticky {
@@ -142,11 +153,6 @@
     background: transparent; 
   }
 
-  /* 
-     SAMSUNG INTERNET FIX: 
-     Pure SVG rendered elements. Bypasses all CSS Box-Shadow/Gradient bugs 
-     in mobile Webkit engines, forcing perfect color mapping.
-  */
   .eclipse-system {
     position: relative;
     width: min(45vmin, 340px);
@@ -155,18 +161,18 @@
     z-index: 2;
   }
 
+  /* TIGHT SVG CORONA - Identical across all mobile & desktop browsers */
   .sun-svg, .moon-svg {
     position: absolute;
-    top: -25%;
-    left: -25%;
-    width: 150%;
-    height: 150%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     overflow: visible;
   }
 
   .moon-svg {
     will-change: transform;
-    transform: translate3d(0, 0, 0); /* Perfect totality on load */
+    transform: translate3d(0, 0, 0); 
   }
 
   /* ============================================
@@ -178,55 +184,62 @@
     top: 0; left: 0; width: 100vw; height: 100vh;
     pointer-events: none;
     z-index: 20;
-    opacity: var(--flare-op, 0); /* Starts hidden during Totality */
+    opacity: var(--flare-op, 0); 
     will-change: opacity;
   }
 
   .flare-artifact {
     position: absolute;
     top: 50%; left: 50%;
-    border-radius: 50%;
+    border-radius: 9999px;
     will-change: transform;
     mix-blend-mode: screen;
   }
 
-  /* Core burst of light tracked to the visible edge of the sun */
+  /* Core burst of light tracked exactly to the exposed sun edge */
   .flare-burst {
     width: 0px; height: 0px;
-    box-shadow: 0px 0px 40px 15px rgba(255,240,200,1), 0px 0px 15px 8px rgba(255,255,255,1);
-    transform: translate(calc(-50% + var(--fx) * -1), calc(-50% + var(--fy) * -1));
+    box-shadow: 0px 0px 30px 10px rgba(255,240,200,1), 0px 0px 10px 5px rgba(255,255,255,1);
+    transform: translate(calc(-50% + var(--lx)), calc(-50% + var(--ly)));
   }
 
-  /* Ghost reflections traveling opposite direction */
+  /* Cinematic Anamorphic Streak */
+  .flare-streak {
+    width: 150vw; height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,220,180,0.1) 40%, rgba(255,255,255,0.9) 50%, rgba(255,220,180,0.1) 60%, transparent 100%);
+    transform: translate(calc(-50% + var(--lx)), calc(-50% + var(--ly))) rotate(-15deg);
+  }
+
+  /* Ghost reflections traveling opposite direction along the optical axis */
   .flare-1 {
     width: 100px; height: 100px;
     box-shadow: inset 0px 0px 20px 2px rgba(190,190,240,0.125), 0px 0px 20px 0px rgba(190,190,240,0.125);
-    transform: translate(calc(-50% + var(--fx) * 2), calc(-50% + var(--fy) * 2));
+    transform: translate(calc(-50% + var(--lx) * -0.5), calc(-50% + var(--ly) * -0.5));
   }
   .flare-2 {
     width: 200px; height: 200px;
     box-shadow: inset 0px 0px 100px 2px rgba(200,230,200,0.125), 0px 0px 13px 2px rgba(200,230,200,0.125);
-    transform: translate(calc(-50% + var(--fx) * 1.5), calc(-50% + var(--fy) * 1.5));
+    transform: translate(calc(-50% + var(--lx) * -1.2), calc(-50% + var(--ly) * -1.2));
   }
   .flare-3 {
     width: 600px; height: 600px;
     box-shadow: inset 0px 0px 22px 2px rgba(255,50,50,0.15), 0px 0px 13px 2px rgba(255,50,50,0.15);
-    transform: translate(calc(-50% + var(--fx) * 0.8), calc(-50% + var(--fy) * 0.8));
+    transform: translate(calc(-50% + var(--lx) * -2.2), calc(-50% + var(--ly) * -2.2));
   }
   .flare-4 {
     width: 100px; height: 100px;
     box-shadow: inset 0px 0px 160px 2px rgba(50,180,50,0.125), 0px 0px 20px 2px rgba(50,180,50,0.125);
-    transform: translate(calc(-50% + var(--fx) * -0.5), calc(-50% + var(--fy) * -0.5));
+    transform: translate(calc(-50% + var(--lx) * 0.8), calc(-50% + var(--ly) * 0.8));
   }
   .flare-5 {
     width: 60px; height: 60px;
     box-shadow: inset 0px 0px 160px 2px rgba(200,220,80,0.25), 0px 0px 20px 2px rgba(200,220,80,0.25);
-    transform: translate(calc(-50% + var(--fx) * 0.2), calc(-50% + var(--fy) * 0.2));
+    transform: translate(calc(-50% + var(--lx) * 0.3), calc(-50% + var(--ly) * 0.3));
   }
   .flare-6 {
     width: 20px; height: 20px;
     box-shadow: inset 0px 0px 18px 10px rgba(150,220,220,0.25), 0px 0px 5px 0px rgba(150,220,220,0.25);
-    transform: translate(calc(-50% + var(--fx) * -0.2), calc(-50% + var(--fy) * -0.2));
+    transform: translate(calc(-50% + var(--lx) * -0.2), calc(-50% + var(--ly) * -0.2));
   }
 
   /* ============================================
@@ -247,7 +260,6 @@
     margin-bottom: 18px;
   }
 
-  /* Font reverted to Jost */
   .title {
     font-family: 'Jost', sans-serif;
     font-size: clamp(3.5rem, 11vw, 6.5rem);
@@ -265,7 +277,6 @@
     letter-spacing: 0.02em;
   }
 
-  /* Moved up and slightly larger to prevent getting lost on mobile */
   .scroll-cue {
     position: absolute;
     bottom: 60px; 
@@ -294,252 +305,4 @@
 
   @keyframes dropline {
     0%, 100% { transform: scaleY(0.3); transform-origin: top; opacity: 0.4; }
-    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
-  }
-
-  /* ============================================
-     6. GALLERY 
-  ============================================ */
-  .gallery {
-    background: transparent; 
-    padding: clamp(40px, 8vh, 80px) clamp(20px, 5vw, 48px) 40px;
-  }
-
-  .duo {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 clamp(20px, 5vw, 48px) clamp(40px, 8vh, 76px);
-    display: flex;
-    gap: 22px;
-  }
-
-  .duo .frame { flex: 1; margin-bottom: 0; }
-  .duo .frame.mirror { transform: translateY(24px) scaleX(-1); }
-  .duo .frame.mirror.visible { transform: translateY(0) scaleX(-1); }
-
-  .gallery-grid {
-    columns: 3 300px;
-    column-gap: 22px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .frame {
-    break-inside: avoid;
-    margin-bottom: 22px;
-    border-radius: 10px;
-    overflow: hidden;
-    background: #1a1720;
-    border: 1px solid var(--hairline);
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  }
-
-  .frame.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .frame img {
-    display: block;
-    width: 100%;
-    height: auto;
-    cursor: zoom-in;
-  }
-
-  .frame:not(.frame--empty):hover {
-    border-color: rgba(242, 200, 121, 0.4);
-    box-shadow: 0 0 0 1px rgba(242, 200, 121, 0.15), 0 18px 40px rgba(0, 0, 0, 0.45);
-    transform: translateY(-3px);
-  }
-
-  .frame--empty {
-    aspect-ratio: var(--ar, 3/4);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    color: var(--muted);
-    border-style: dashed;
-  }
-
-  .frame--empty svg { opacity: 0.5; }
-  .frame--empty span { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; }
-
-  footer {
-    background: transparent;
-    display: flex;
-    justify-content: center;
-    padding: 60px 24px 80px;
-  }
-
-  /* ============================================
-     7. LIGHTBOX & ACCESSIBILITY
-  ============================================ */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    background: rgba(3, 1, 6, 0.96);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 100;
-    padding: 40px;
-  }
-
-  .lightbox.open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .lightbox img {
-    max-width: 100%;
-    max-height: 82vh;
-    border-radius: 6px;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
-  }
-
-  .lightbox figcaption {
-    text-align: center;
-    margin-top: 16px;
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-
-  .lightbox-close, .lightbox-prev, .lightbox-next {
-    position: absolute;
-    background: transparent;
-    border: none;
-    color: var(--starlight);
-    font-family: 'Jost', sans-serif;
-    font-size: 1.6rem;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
-  }
-
-  .lightbox-close:hover, .lightbox-prev:hover, .lightbox-next:hover { opacity: 1; }
-  .lightbox-close { top: 24px; right: 32px; font-size: 1.8rem; }
-  .lightbox-prev { left: clamp(12px, 3vw, 40px); top: 50%; transform: translateY(-50%); font-size: 2.4rem; }
-  .lightbox-next { right: clamp(12px, 3vw, 40px); top: 50%; transform: translateY(-50%); font-size: 2.4rem; }
-
-  @media (max-width: 640px) {
-    .duo { flex-direction: column; }
-    .gallery-grid { columns: 1 100%; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    .parallax-layer { transition: none !important; transform: none !important; }
-    .star-glow-container { animation: none !important; opacity: 0.8 !important; }
-    .frame { transition: none !important; }
-    .scroll-cue .line { animation: none !important; }
-  }
-</style>
-</head>
-<body>
-
-  <!-- BACKGROUND PARALLAX LAYER CONTAINER -->
-  <div class="sky-parallax-container">
-      <div class="sky-light-overlay"></div>
-      <div class="parallax-layer layer-background"></div>
-      <div class="parallax-layer layer-midground"></div>
-      <div class="parallax-layer layer-foreground"></div>
-  </div>
-
-  <!-- FOREGROUND CONTENT WRAPPER -->
-  <main class="site-content">
-    
-    <!-- LENS FLARE SYSTEM (Rendered safely above stars, below content) -->
-    <div class="flare-system" id="flareSystem">
-        <div class="flare-artifact flare-burst"></div>
-        <div class="flare-artifact flare-1"></div>
-        <div class="flare-artifact flare-2"></div>
-        <div class="flare-artifact flare-3"></div>
-        <div class="flare-artifact flare-4"></div>
-        <div class="flare-artifact flare-5"></div>
-        <div class="flare-artifact flare-6"></div>
-    </div>
-
-    <section class="hero-wrap" id="heroWrap">
-      <div class="hero-sticky" id="heroSticky">
-        <div class="eclipse-system">
-          
-          <!-- SVG SUN: Unbreakable Cross-Browser Gradient Map -->
-          <svg class="sun-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="10%" stop-color="#ffffff" stop-opacity="1" />
-                <stop offset="25%" stop-color="#f2c879" stop-opacity="1" />
-                <stop offset="50%" stop-color="#ff8a5b" stop-opacity="0.85" />
-                <stop offset="100%" stop-color="#ff8a5b" stop-opacity="0" />
-              </radialGradient>
-            </defs>
-            <circle cx="50" cy="50" r="50" fill="url(#sunGrad)"/>
-          </svg>
-
-          <!-- SVG MOON: Overlays perfect pitch-black circle with delicate 3D rim -->
-          <svg class="moon-svg" id="moon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-             <circle cx="50" cy="50" r="23.5" fill="#030106"/>
-             <circle cx="49.5" cy="49.5" r="23.5" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.3"/>
-          </svg>
-          
-        </div>
-        
-        <div class="hero-text">
-          <p class="eyebrow">Iceland &middot; 2026</p>
-          <h1 class="title">Sarra</h1>
-          <p class="tagline">totality, and everything after</p>
-        </div>
-        
-        <div class="scroll-cue">
-          <span>Scroll</span>
-          <div class="line"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="gallery">
-      <div class="duo">
-        <div class="frame"><img src="images/duo-left.jpg" alt="" loading="lazy"></div>
-        <div class="frame mirror"><img src="images/duo-right.jpg" alt="" loading="lazy"></div>
-      </div>
-    </section>
-
-    <section class="gallery">
-      <div class="gallery-grid" id="galleryGrid"></div>
-    </section>
-
-    <footer>
-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-        <circle cx="13" cy="13" r="11.5" stroke="#8f8a97" stroke-width="1"/>
-        <circle cx="13" cy="13" r="6" fill="#8f8a97"/>
-      </svg>
-    </footer>
-
-  </main>
-
-  <!-- LIGHTBOX -->
-  <div class="lightbox" id="lightbox">
-    <button class="lightbox-close" id="lbClose" aria-label="Close">&times;</button>
-    <button class="lightbox-prev" id="lbPrev" aria-label="Previous photo">&lsaquo;</button>
-    <figure>
-      <img id="lbImg" src="" alt="">
-      <figcaption id="lbCaption"></figcaption>
-    </figure>
-    <button class="lightbox-next" id="lbNext" aria-label="Next photo">&rsaquo;</button>
-  </div>
-
-<script>
-  /* ============================================
-     PHOTO CONFIGURATION
-  ============================================ */
-  const photos = [
-    { src: "images/photo-01.jpg", caption: "" },
-    { src: "images/photo-02.jpg", caption: "" },
-    {
+    50% { transform: scaleY(1);
