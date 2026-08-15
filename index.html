@@ -66,67 +66,55 @@
     perspective: 1000px;
   }
 
-  /* Subtly faded constellation grid layout overlay */
-  .sky-parallax-container::before {
-    content: "";
-    position: absolute;
-    inset: -20vw;
-    background-image: 
-      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), 
-      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-    background-size: 80px 80px;
-    -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 65%);
-    mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 15%, rgba(0,0,0,0) 65%);
-    z-index: 0;
-  }
-
   .parallax-layer {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     will-change: transform;
     z-index: 1;
   }
 
-  .layer-background { transform: translate3d(calc(var(--mx, 0) * 12px), calc(var(--my, 0) * 12px), 0); }
-  .layer-midground { transform: translate3d(calc(var(--mx, 0) * 28px), calc(var(--my, 0) * 28px), 0); }
-  .layer-foreground { transform: translate3d(calc(var(--mx, 0) * 48px), calc(var(--my, 0) * 48px), 0); }
+  .layer-background { transform: translate3d(calc(var(--mx, 0) * 10px), calc(var(--my, 0) * 10px), 0); }
+  .layer-midground { transform: translate3d(calc(var(--mx, 0) * 25px), calc(var(--my, 0) * 25px), 0); }
+  .layer-foreground { transform: translate3d(calc(var(--mx, 0) * 45px), calc(var(--my, 0) * 45px), 0); }
 
   /* 
-     STAR HALO BUG FIX: 
-     Parent container handles Drop Shadow + Animation to fix Webkit Clip-Path bug.
-     Using transforms over filter manipulation boosts rendering to 120fps.
+     STAR REFINEMENT: 
+     Wrapper inherits color dynamically via JS and applies drop-shadow. 
+     Core shape handles the 4-point mask and inherits color.
   */
   .star-glow-container {
     position: absolute;
     will-change: transform, opacity;
-    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.85));
+    /* 'currentColor' trick forces the glow to match the physical star color assigned in JS */
+    filter: drop-shadow(0 0 3px currentColor);
   }
 
   .star-refined {
     width: 100%;
     height: 100%;
-    background-color: #ffffff;
+    background-color: currentColor;
     clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
   }
   
   .star-size-tiny { width: 3.5px; height: 3.5px; }
-  .star-size-capped { width: 7px; height: 7px; }
+  .star-size-capped { width: 6.5px; height: 6.5px; }
 
-  .anim-fast-flicker { animation: renderFastFlicker 0.33s infinite ease-in-out; }
-  .anim-slow-glow { animation: renderSlowGlow 1.5s infinite ease-in-out; }
+  /* Smooth original twinkle rates */
+  .anim-fast-flicker { animation: fastFlicker 0.9s infinite ease-in-out; }
+  .anim-slow-glow { animation: slowGlow 4.5s infinite ease-in-out; }
 
-  @keyframes renderFastFlicker {
-    0%, 100% { opacity: 0.15; transform: scale(0.65); }
-    50% { opacity: 1.0; transform: scale(1.15); }
+  @keyframes fastFlicker {
+    0%, 100% { opacity: 0.15; transform: scale(0.6); filter: drop-shadow(0 0 1px currentColor); }
+    50% { opacity: 1.0; transform: scale(1.15); filter: drop-shadow(0 0 3px currentColor); }
   }
 
-  @keyframes renderSlowGlow {
-    0%, 100% { opacity: 0.3; transform: scale(0.75); }
-    50% { opacity: 1.0; transform: scale(1.05); }
+  @keyframes slowGlow {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); filter: drop-shadow(0 0 2px currentColor); }
+    50% { opacity: 0.95; transform: scale(1.05); filter: drop-shadow(0 0 4px currentColor); }
   }
 
   /* ============================================
@@ -162,50 +150,72 @@
     margin-bottom: clamp(28px, 5vh, 52px);
   }
 
-  /* SAMSUNG INTERNET FIX: Explicit RGB color stops prevent the brown/black bug */
+  /* 
+     SAMSUNG INTERNET FIX: 
+     Radial gradients stripped out. Standard divs with blurs stacked on top of 
+     each other to create an unbreakable cross-browser sun halo.
+  */
   .corona {
     position: absolute;
     inset: -20%;
     border-radius: 50%;
-    background: radial-gradient(circle, rgb(242, 200, 121) 0%, rgba(242, 200, 121, 0.45) 32%, rgba(242, 200, 121, 0) 68%);
-    filter: blur(3px);
+    background-color: #f2c879;
+    filter: blur(40px);
     opacity: var(--corona-op, 0); 
     will-change: opacity;
   }
 
-  .sun {
+  .sun-outer-glow {
     position: absolute;
-    inset: 0;
+    inset: -10%;
     border-radius: 50%;
-    background-color: rgb(255, 255, 255);
-    background-image: radial-gradient(circle at 40% 35%, rgb(255, 255, 255) 0%, rgb(255, 220, 160) 20%, rgb(242, 200, 121) 70%, rgb(255, 138, 91) 100%);
-    box-shadow: 0 0 35px rgba(242, 200, 121, 0.4);
+    background-color: #ff8a5b;
+    filter: blur(25px);
+    opacity: 0.65;
   }
 
+  .sun-inner-glow {
+    position: absolute;
+    inset: 0%;
+    border-radius: 50%;
+    background-color: #f2c879;
+    filter: blur(12px);
+    opacity: 0.9;
+  }
+
+  .sun-core {
+    position: absolute;
+    inset: 10%;
+    border-radius: 50%;
+    background-color: #ffffff;
+    filter: blur(2px);
+    box-shadow: 0 0 15px #ffffff;
+  }
+
+  /* Dynamic Diamond Ring */
   .flash {
     position: absolute;
-    left: -4%;
-    top: 40%;
+    top: 50%;
     width: 15%;
     height: 15%;
     border-radius: 50%;
     background: var(--starlight);
-    box-shadow: 0 0 28px 10px var(--ember);
+    box-shadow: 0 0 30px 10px var(--ember);
     transform: translateY(-50%);
-    opacity: var(--flash, 0); 
+    opacity: var(--flash, 1); /* Starts visible! */
     pointer-events: none;
     will-change: opacity;
   }
 
   .moon {
     position: absolute;
-    inset: -1px; /* Slight scaling overlap to prevent sun bleeding on edges */
+    inset: -2px; 
     border-radius: 50%;
-    background-color: rgb(23, 22, 28);
-    background-image: radial-gradient(circle at 35% 32%, rgb(44, 41, 51) 0%, rgb(23, 22, 28) 70%);
+    background-color: #17161c;
+    /* Uses inset shadow for 3D shading, completely safe on older browsers */
+    box-shadow: inset 18px 18px 25px rgba(44, 41, 51, 0.7);
     will-change: transform;
-    /* Default position set for users with Javascript disabled */
-    transform: translate3d(0, 0, 0); 
+    transform: translate3d(-12px, -6px, 0); /* Starts slightly offset */
   }
 
   .hero-text {
@@ -437,15 +447,22 @@
       <div class="hero-sticky" id="heroSticky">
         <div class="eclipse-system">
           <div class="corona"></div>
-          <div class="sun"></div>
-          <div class="flash"></div>
+          
+          <!-- Universal browser-safe sun -->
+          <div class="sun-outer-glow"></div>
+          <div class="sun-inner-glow"></div>
+          <div class="sun-core"></div>
+          
+          <div class="flash" id="flash"></div>
           <div class="moon" id="moon"></div>
         </div>
+        
         <div class="hero-text">
           <p class="eyebrow">Iceland &middot; 2026</p>
           <h1 class="title">Sarra</h1>
           <p class="tagline">totality, and everything after</p>
         </div>
+        
         <div class="scroll-cue">
           <span>Scroll</span>
           <div class="line"></div>
@@ -512,46 +529,87 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ============================================
-     170-STAR NESTED DYNAMIC INJECTOR
-     Nests elements to fix the Clip-Path rendering bug.
+     DYNAMIC DENSITY STARFIELD & BRIDGES
+     Calculates screen width to adjust star count, 
+     then injects SVG constellation lines.
   ============================================ */
-  function buildStarfield(totalStars) {
+  function buildStarfield() {
+    // Scales star count linearly based on screen width (Desktop gets way more stars)
+    const densityMultiplier = Math.max(0.5, window.innerWidth / 900);
+    const isDesktop = window.innerWidth > 768;
+
     const layers = [
-      { selector: '.layer-background', ratio: 0.4, sizeClass: 'star-size-capped', animClass: 'anim-slow-glow' },
-      { selector: '.layer-midground', ratio: 0.4, sizeClass: 'star-size-tiny', animClass: 'anim-fast-flicker' },
-      { selector: '.layer-foreground', ratio: 0.2, sizeClass: 'star-size-tiny', animClass: 'anim-fast-flicker' }
+      { selector: '.layer-background', count: Math.floor(70 * densityMultiplier), sizeClass: 'star-size-capped', animClass: 'anim-slow-glow', bridges: Math.floor(15 * densityMultiplier) },
+      { selector: '.layer-midground', count: Math.floor(70 * densityMultiplier), sizeClass: 'star-size-tiny', animClass: 'anim-fast-flicker', bridges: Math.floor(10 * densityMultiplier) },
+      { selector: '.layer-foreground', count: Math.floor(35 * densityMultiplier), sizeClass: 'star-size-tiny', animClass: 'anim-fast-flicker', bridges: 0 } // No bridges in foreground
     ];
+
+    // Cosmic colors: Crisp whites, slight blues (O-type), soft orange/red (M-type)
+    const starColors = ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#e0ecff', '#ffebd6', '#ffd0b3'];
 
     layers.forEach(layer => {
       const container = document.querySelector(layer.selector);
       if (!container) return;
       
-      const count = Math.floor(totalStars * layer.ratio);
       const frag = document.createDocumentFragment();
+      const coords = [];
       
-      for (let i = 0; i < count; i++) {
-        // Parent handles positioning, animation, and drop-shadow
+      // Inject Star Nodes
+      for (let i = 0; i < layer.count; i++) {
         const starWrapper = document.createElement('div');
         starWrapper.className = `star-glow-container ${layer.sizeClass} ${layer.animClass}`;
         
-        const left = (Math.random() * 100).toFixed(2);
-        const top = (Math.random() * 100).toFixed(2);
-        const delay = (Math.random() * 2).toFixed(2);
+        const left = (Math.random() * 100);
+        const top = (Math.random() * 100);
+        const delay = (Math.random() * 4).toFixed(2);
+        const color = starColors[Math.floor(Math.random() * starColors.length)];
         
-        starWrapper.style.cssText = `left: ${left}%; top: ${top}%; animation-delay: ${delay}s;`;
+        starWrapper.style.cssText = `left: ${left.toFixed(2)}%; top: ${top.toFixed(2)}%; animation-delay: ${delay}s; color: ${color};`;
         
-        // Child handles the shape and background color
         const starCore = document.createElement('div');
         starCore.className = 'star-refined';
         
         starWrapper.appendChild(starCore);
         frag.appendChild(starWrapper);
+        coords.push({x: left, y: top});
       }
+      
+      // Inject SVG Constellation Bridges for this layer
+      if (layer.bridges > 0) {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; z-index: -1; pointer-events: none;';
+        
+        let drawnLines = 0;
+        for(let i = 0; i < coords.length; i++) {
+            for(let j = i + 1; j < coords.length; j++) {
+                let dx = coords[i].x - coords[j].x;
+                let dy = coords[i].y - coords[j].y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                
+                // Draw a bridge if stars are close enough, with some randomization
+                if (dist > 3 && dist < 12 && Math.random() > 0.75) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", coords[i].x + "%");
+                    line.setAttribute("y1", coords[i].y + "%");
+                    line.setAttribute("x2", coords[j].x + "%");
+                    line.setAttribute("y2", coords[j].y + "%");
+                    line.setAttribute("stroke", "rgba(255, 255, 255, 0.12)");
+                    line.setAttribute("stroke-width", isDesktop ? "0.5" : "1");
+                    svg.appendChild(line);
+                    drawnLines++;
+                }
+                if (drawnLines >= layer.bridges) break;
+            }
+            if (drawnLines >= layer.bridges) break;
+        }
+        frag.appendChild(svg);
+      }
+      
       container.appendChild(frag);
     });
   }
   
-  buildStarfield(170);
+  buildStarfield();
 
   /* ============================================
      MOUSE PARALLAX TRACKER
@@ -579,45 +637,59 @@
   }
 
   /* ============================================
-     600px SCROLL ECLIPSE MECHANIC
+     CINEMATIC ECLIPSE TRANSIT LOGIC
   ============================================ */
   const root = document.documentElement;
   const moon = document.getElementById('moon');
+  const flash = document.getElementById('flash');
   let sTicking = false;
 
   function updateEclipse() {
     sTicking = false;
     if (reduceMotion) {
-      moon.style.transform = `translate3d(0%, 0%, 0)`; // Lock in totality
+      moon.style.transform = `translate3d(0px, 0px, 0)`; 
       return; 
     }
     
-    // Map scroll strictly over the first 600px of scrolling
     const scrollY = window.scrollY;
-    const progress = Math.min(1, Math.max(0, scrollY / 600));
+    // Pin transit strictly to the first 600px of vertical scroll
+    const p = Math.min(1, Math.max(0, scrollY / 600)); 
     
-    // At scroll=0, moon is top left (-120%, -40%). At scroll=600, moon is dead center (0, 0)
-    const moonX = -120 * (1 - progress);
-    const moonY = -40 * (1 - progress);
-    
-    // Diamond Ring Flash peaks directly at 92% of the way to totality
-    let flash = 0;
-    if (progress > 0.8 && progress < 1.0) {
-       flash = Math.max(0, 1 - Math.abs(progress - 0.92) / 0.08);
-    }
-    
-    // Corona glows brighter as totality approaches
-    const coronaOpacity = progress * 0.95;
+    let moonX, moonY, flashOp;
+    const maxOffset = window.innerWidth <= 640 ? 120 : 250;
 
-    // Apply values
-    root.style.setProperty('--flash', flash.toFixed(3));
-    root.style.setProperty('--corona-op', coronaOpacity.toFixed(3));
+    if (p <= 0.25) { 
+        // PHASE 1 (0 to 150px): Moving from offset INTO absolute totality
+        let localP = p / 0.25; // 0 to 1
+        moonX = -12 * (1 - localP); // Starts slightly left
+        moonY = -6 * (1 - localP);  // Starts slightly up
+        flashOp = 1 - localP;       // Diamond Ring fades out
+        flash.style.left = '-4%';   // Position left edge
+        flash.style.right = 'auto';
+    } else { 
+        // PHASE 2 (150px to 600px): Totality ends, moving OUT to reveal sun
+        let localP = (p - 0.25) / 0.75; // 0 to 1
+        moonX = localP * maxOffset; 
+        moonY = localP * (maxOffset * 0.2); // Slides down-right away from sun
+        
+        // As moon cracks the sun, Diamond Ring returns briefly on the opposite side
+        if (localP < 0.15) {
+            flashOp = localP / 0.15; // Rises 0 to 1
+        } else {
+            flashOp = Math.max(0, 1 - ((localP - 0.15) / 0.35)); // Fades 1 to 0 quickly
+        }
+        flash.style.left = 'auto';
+        flash.style.right = '-4%'; // Position right edge
+    }
+
+    // Apply values to DOM
+    flash.style.opacity = flashOp.toFixed(3);
+    root.style.setProperty('--corona-op', (1 - p).toFixed(3));
     
-    // Fade out text as we scroll down to let the image shine
     const textFade = Math.min(1, scrollY / 300);
     root.style.setProperty('--fade-text', textFade.toFixed(3));
     
-    moon.style.transform = `translate3d(${moonX}%, ${moonY}%, 0)`;
+    moon.style.transform = `translate3d(${moonX}px, ${moonY}px, 0)`;
   }
 
   window.addEventListener('scroll', () => {
@@ -627,6 +699,7 @@
     }
   }, { passive: true });
 
+  // Initial trigger calculation
   updateEclipse();
 
   /* ============================================
