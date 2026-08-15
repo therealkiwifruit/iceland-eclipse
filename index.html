@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- STRICT DARK MODE ENFORCEMENT: Prevents Samsung Internet from inverting colors -->
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#000000">
 <meta name="robots" content="noindex, nofollow">
 <title>Sarra - Eclipse 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Added Extra Light (200) weight for the slimmer title -->
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
   /* ============================================
      1. DESIGN TOKENS & CORE RESET
   ============================================ */
   :root {
-    color-scheme: dark; /* Double enforcement for WebKit engines */
+    color-scheme: dark; 
     --void: #000000;        
     --corona: #f2c879;      
     --ember: #ff8a5b;       
@@ -60,7 +60,7 @@
     left: -10vw;
     width: 120vw;
     height: 130vh;
-    background-color: var(--void); /* Pitch Black Start */
+    background-color: var(--void);
     overflow: hidden;
     z-index: 0; 
     pointer-events: none;
@@ -70,7 +70,6 @@
   .sky-light-overlay {
     position: absolute;
     inset: 0;
-    /* Deep purple glow that fades in with the lens flare */
     background: linear-gradient(135deg, rgba(30, 15, 65, 0.9) 0%, rgba(20, 5, 35, 0.5) 60%, transparent 100%);
     opacity: var(--bg-flare, 0); 
     will-change: opacity;
@@ -88,16 +87,10 @@
     z-index: 1;
   }
 
-  /* Incorporates Scroll-Y for mobile parallax without a mouse */
   .layer-background { transform: translate3d(calc(var(--mx, 0) * 10px), calc(var(--my, 0) * 10px - var(--scroll-y, 0) * 0.05px), 0); }
   .layer-midground { transform: translate3d(calc(var(--mx, 0) * 25px), calc(var(--my, 0) * 25px - var(--scroll-y, 0) * 0.15px), 0); }
   .layer-foreground { transform: translate3d(calc(var(--mx, 0) * 45px), calc(var(--my, 0) * 45px - var(--scroll-y, 0) * 0.35px), 0); }
 
-  /* 
-     STAR REFINEMENT: 
-     Wrapper applies the colored drop-shadow. 
-     Inner core is intensely white to look sharp and bright.
-  */
   .star-glow-container {
     position: absolute;
     will-change: transform, opacity;
@@ -137,7 +130,7 @@
 
   .hero-wrap {
     position: relative;
-    height: 120vh; /* Reduced to eliminate the massive gap before gallery */
+    height: 120vh; 
   }
 
   .hero-sticky {
@@ -161,23 +154,33 @@
     z-index: 2;
   }
 
-  /* TIGHT SVG CORONA - Identical across all mobile & desktop browsers */
-  .sun-svg, .moon-svg {
+  /* 
+     CANVAS ELEMENTS: 
+     Engine-immune raster elements that completely bypass
+     the Samsung Internet dark mode color override bug.
+  */
+  .sun-canvas {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+    mix-blend-mode: screen; /* Makes the corona incredibly vibrant */
   }
 
-  .moon-svg {
+  .moon-canvas {
+    position: absolute;
+    inset: -1px; /* Subtle overlap padding */
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
     will-change: transform;
     transform: translate3d(0, 0, 0); 
+    pointer-events: none;
   }
 
   /* ============================================
      4. PHYSICS-ACCURATE LENS FLARE SYSTEM
-     Translates along the center axis opposite the sun
   ============================================ */
   .flare-system {
     position: fixed;
@@ -196,21 +199,18 @@
     mix-blend-mode: screen;
   }
 
-  /* Core burst of light tracked exactly to the exposed sun edge */
   .flare-burst {
     width: 0px; height: 0px;
     box-shadow: 0px 0px 30px 10px rgba(255,240,200,1), 0px 0px 10px 5px rgba(255,255,255,1);
     transform: translate(calc(-50% + var(--lx)), calc(-50% + var(--ly)));
   }
 
-  /* Cinematic Anamorphic Streak */
   .flare-streak {
     width: 150vw; height: 2px;
     background: linear-gradient(90deg, transparent 0%, rgba(255,220,180,0.1) 40%, rgba(255,255,255,0.9) 50%, rgba(255,220,180,0.1) 60%, transparent 100%);
     transform: translate(calc(-50% + var(--lx)), calc(-50% + var(--ly))) rotate(-15deg);
   }
 
-  /* Ghost reflections traveling opposite direction along the optical axis */
   .flare-1 {
     width: 100px; height: 100px;
     box-shadow: inset 0px 0px 20px 2px rgba(190,190,240,0.125), 0px 0px 20px 0px rgba(190,190,240,0.125);
@@ -260,11 +260,15 @@
     margin-bottom: 18px;
   }
 
+  /* 
+     TYPOGRAPHY UPDATE:
+     Slimmer font-weight (200), increased letter-spacing for high elegance.
+  */
   .title {
     font-family: 'Jost', sans-serif;
     font-size: clamp(3.5rem, 11vw, 6.5rem);
-    font-weight: 400;
-    letter-spacing: 0.08em;
+    font-weight: 200; 
+    letter-spacing: 0.15em; 
     line-height: 1;
     color: var(--starlight);
   }
@@ -482,26 +486,9 @@
       <div class="hero-sticky" id="heroSticky">
         <div class="eclipse-system">
           
-          <!-- TIGHT SVG SUN -->
-          <svg class="sun-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="85%" stop-color="#ffffff" stop-opacity="1" />
-                <stop offset="90%" stop-color="#f2c879" stop-opacity="1" />
-                <stop offset="93%" stop-color="#ff8a5b" stop-opacity="0.9" />
-                <stop offset="96%" stop-color="#cc3300" stop-opacity="0.4" />
-                <stop offset="100%" stop-color="#000000" stop-opacity="0" />
-              </radialGradient>
-            </defs>
-            <circle cx="50" cy="50" r="50" fill="url(#sunGrad)"/>
-          </svg>
-
-          <!-- SVG MOON -->
-          <svg class="moon-svg" id="moon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-             <circle cx="50" cy="50" r="49" fill="#000000"/>
-             <!-- Faint rim light to create 3D spherical depth -->
-             <circle cx="49.5" cy="49.5" r="49" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
-          </svg>
+          <!-- CANVAS RENDERED ECLIPSE - Immune to all browser theme manipulation -->
+          <canvas id="sunCanvas" class="sun-canvas"></canvas>
+          <canvas id="moonCanvas" class="moon-canvas" id="moon"></canvas>
           
         </div>
         
@@ -577,6 +564,61 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ============================================
+     CANVAS ECLIPSE GENERATOR
+     Draws directly to pixels, avoiding CSS color-inversion completely.
+  ============================================ */
+  function drawEclipseElements() {
+      // 1. Draw The Glowing Sun (Corona)
+      const sunCanvas = document.getElementById('sunCanvas');
+      const sCtx = sunCanvas.getContext('2d');
+      const sSize = 800; // High-res internal rendering
+      sunCanvas.width = sSize;
+      sunCanvas.height = sSize;
+
+      const sCx = sSize / 2;
+      const sCy = sSize / 2;
+      const sGrad = sCtx.createRadialGradient(sCx, sCy, 0, sCx, sCy, sSize / 2);
+
+      // The moon covers exactly 50% of this canvas width. 
+      // Stop 0.505 creates the piercing white edge bleeding past the moon.
+      sGrad.addColorStop(0, '#ffffff');
+      sGrad.addColorStop(0.48, '#ffffff'); 
+      sGrad.addColorStop(0.505, '#ffffff'); 
+      sGrad.addColorStop(0.54, '#f2d299');  // Intense gold halo
+      sGrad.addColorStop(0.65, '#e67345');  // Deep red/orange spread
+      sGrad.addColorStop(0.85, 'rgba(80, 15, 20, 0.4)'); // Smooth fade
+      sGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      sCtx.fillStyle = sGrad;
+      sCtx.fillRect(0, 0, sSize, sSize);
+
+      // 2. Draw The Pitch Black Moon
+      const moonCanvas = document.getElementById('moonCanvas');
+      const mCtx = moonCanvas.getContext('2d');
+      const mSize = 400; // High-res internal rendering
+      moonCanvas.width = mSize;
+      moonCanvas.height = mSize;
+      const mCx = mSize / 2;
+      const mCy = mSize / 2;
+      const mRadius = (mSize / 2) - 2; 
+
+      // Render pitch-black circle
+      mCtx.beginPath();
+      mCtx.arc(mCx, mCy, mRadius, 0, 2 * Math.PI);
+      mCtx.fillStyle = '#010002'; // Engine immune pitch black
+      mCtx.fill();
+
+      // Render delicate 3D rim lighting
+      mCtx.beginPath();
+      mCtx.arc(mCx - 2, mCy - 2, mRadius, 0, 2 * Math.PI);
+      mCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      mCtx.lineWidth = 2;
+      mCtx.stroke();
+  }
+  
+  drawEclipseElements();
+
+  /* ============================================
      DYNAMIC DENSITY STARFIELD & BRIDGES
   ============================================ */
   function buildStarfield() {
@@ -607,13 +649,10 @@
         const delay = (Math.random() * 4).toFixed(2);
         const color = starColors[Math.floor(Math.random() * starColors.length)];
         
-        // Explicitly setting drop-shadow in style blocks Samsung Dark Mode from overriding the color
-        starWrapper.style.cssText = `left: ${left.toFixed(2)}%; top: ${top.toFixed(2)}%; animation-delay: ${delay}s; filter: drop-shadow(0 0 5px ${color});`;
+        starWrapper.style.cssText = `left: ${left.toFixed(2)}%; top: ${top.toFixed(2)}%; animation-delay: ${delay}s; color: ${color}; filter: drop-shadow(0 0 5px ${color});`;
         
         const starCore = document.createElement('div');
         starCore.className = 'star-refined';
-        // Force the core white so it pierces through the colored glow
-        starCore.style.backgroundColor = '#ffffff'; 
         
         starWrapper.appendChild(starCore);
         frag.appendChild(starWrapper);
@@ -633,7 +672,6 @@
                 
                 if (dist > 3 && dist < 12 && Math.random() > 0.75) {
                     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    // Translating the stars via CSS -50% ensures these exact coordinates map directly to the star's center.
                     line.setAttribute("x1", coords[i].x + "%");
                     line.setAttribute("y1", coords[i].y + "%");
                     line.setAttribute("x2", coords[j].x + "%");
@@ -685,7 +723,7 @@
      CINEMATIC ECLIPSE & LENS FLARE PHYSICS
   ============================================ */
   const root = document.documentElement;
-  const moon = document.getElementById('moon');
+  const moonCanvas = document.getElementById('moonCanvas');
   const heroWrap = document.getElementById('heroWrap');
   let sTicking = false;
 
@@ -693,12 +731,10 @@
     sTicking = false;
     const scrollY = window.scrollY;
     
-    // Send scroll value to CSS for mobile parallax tracking
+    // Set scroll property for mobile background parallax tracking
     root.style.setProperty('--scroll-y', scrollY);
 
-    if (reduceMotion) {
-      return; 
-    }
+    if (reduceMotion) return; 
     
     // Mapping purely to the height of the hero container
     const totalScroll = Math.max(1, heroWrap.offsetHeight - window.innerHeight);
@@ -706,8 +742,7 @@
     
     const maxOffset = window.innerWidth <= 640 ? 120 : 250;
     
-    // Moon starts at (0,0) resulting in Absolute Totality. 
-    // It slides smoothly to the right and slightly down to reveal the sun.
+    // Moon starts at perfect 0,0 (Totality)
     let moonX = p * maxOffset; 
     let moonY = p * (maxOffset * 0.3); 
 
@@ -729,8 +764,7 @@
     
     bgFlare = flareOp * 0.9; 
 
-    // LENS PHYSICS: Track the sun relative to the viewport center.
-    // The sun itself is fixed inside .eclipse-system, but .eclipse-system moves UP as we scroll down.
+    // PHYSICS TRACKING: Map the literal pixel coordinates of the sun to the flare engine
     const eclipseRect = document.querySelector('.eclipse-system').getBoundingClientRect();
     const viewportCenterX = window.innerWidth / 2;
     const viewportCenterY = window.innerHeight / 2;
@@ -738,11 +772,10 @@
     const sunCenterX = eclipseRect.left + eclipseRect.width / 2;
     const sunCenterY = eclipseRect.top + eclipseRect.height / 2;
     
-    // Distance from center of screen to the center of the sun
     const lx = sunCenterX - viewportCenterX;
     const ly = sunCenterY - viewportCenterY;
 
-    // Apply exact pixel values to CSS variables for perfectly accurate translation
+    // Apply values to DOM layout engine
     root.style.setProperty('--flare-op', flareOp.toFixed(3));
     root.style.setProperty('--bg-flare', bgFlare.toFixed(3));
     root.style.setProperty('--lx', lx + 'px');
@@ -751,7 +784,7 @@
     const textFade = Math.min(1, scrollY / 300);
     root.style.setProperty('--fade-text', textFade.toFixed(3));
     
-    moon.style.transform = `translate3d(${moonX}px, ${moonY}px, 0)`;
+    moonCanvas.style.transform = `translate3d(${moonX}px, ${moonY}px, 0)`;
   }
 
   window.addEventListener('scroll', () => {
@@ -761,7 +794,6 @@
     }
   }, { passive: true });
 
-  // Execute immediately on load to set Totality state
   updateEclipse();
 
   /* ============================================
