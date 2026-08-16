@@ -68,7 +68,8 @@
   .sky-light-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(30, 15, 65, 0.9) 0%, rgba(20, 5, 35, 0.5) 60%, transparent 100%);
+    width: 100%;
+    height: 100%;
     opacity: var(--bg-flare, 0); 
     will-change: opacity;
     z-index: 0;
@@ -156,7 +157,6 @@
   /* 
      EXPLICIT ABSOLUTE POSITIONING
      Perfectly anchors the Sun, Text, and Scroll cues.
-     They will not crash into each other.
   */
   .eclipse-system {
     position: absolute;
@@ -206,9 +206,9 @@
   .flare-artifact {
     position: absolute;
     top: 50%; left: 50%;
+    border-radius: 9999px;
     will-change: transform;
     mix-blend-mode: screen;
-    /* CSS controls the sliding motion perfectly */
     transform: translate(calc(-50% + var(--lx) * var(--scale)), calc(-50% + var(--ly) * var(--scale)));
   }
 
@@ -253,7 +253,7 @@
   .title {
     font-family: 'Jost', sans-serif;
     font-size: clamp(3.5rem, 11vw, 6.5rem);
-    font-weight: 200; /* Ultra thin */
+    font-weight: 200; 
     letter-spacing: 0.15em; 
     line-height: 1;
     color: var(--starlight);
@@ -454,8 +454,9 @@
 </head>
 <body>
 
+  <!-- BACKGROUND PARALLAX LAYER CONTAINER -->
   <div class="sky-parallax-container">
-      <div id="skyLightOverlay" class="sky-light-overlay"></div>
+      <canvas id="skyLightOverlay" class="sky-light-overlay"></canvas>
       <canvas id="auroraCanvas" class="aurora-canvas"></canvas>
 
       <div class="parallax-layer layer-background"></div>
@@ -463,9 +464,10 @@
       <div class="parallax-layer layer-foreground"></div>
   </div>
 
+  <!-- FOREGROUND CONTENT WRAPPER -->
   <main class="site-content">
     
-    <!-- LENS FLARE SYSTEM: Converted to pure Canvas to defeat Samsung Dark Mode -->
+    <!-- CANVAS RENDERED LENS FLARE SYSTEM (IMMUNE TO CSS INVERSION) -->
     <div class="flare-system" id="flareSystem">
         <canvas id="flareStreak" class="flare-artifact flare-streak"></canvas>
         <canvas id="flareBurst" class="flare-artifact flare-burst"></canvas>
@@ -563,11 +565,11 @@
       function drawFlare(id, size, stops, isStreak = false) {
           const canvas = document.getElementById(id);
           if (!canvas) return;
-          const ctx = canvas.getContext('2d');
           
           if (isStreak) {
               canvas.width = 3000; 
               canvas.height = 4;
+              const ctx = canvas.getContext('2d');
               const grad = ctx.createLinearGradient(0, 0, 3000, 0);
               stops.forEach(s => grad.addColorStop(s[0], s[1]));
               ctx.fillStyle = grad;
@@ -575,6 +577,7 @@
           } else {
               canvas.width = size; 
               canvas.height = size;
+              const ctx = canvas.getContext('2d');
               const c = size / 2;
               const grad = ctx.createRadialGradient(c, c, 0, c, c, c);
               stops.forEach(s => grad.addColorStop(s[0], s[1]));
@@ -596,6 +599,24 @@
       drawFlare('flare6', 40, [[0, 'rgba(150,220,220,0.4)'], [0.5, 'rgba(0,0,0,0)']]);
   }
 
+  function initSkyCanvas() {
+      const sky = document.getElementById('skyLightOverlay');
+      if (!sky) return;
+      const ctx = sky.getContext('2d');
+      function resize() {
+          sky.width = window.innerWidth * 1.2;
+          sky.height = window.innerHeight * 1.3;
+          const grad = ctx.createLinearGradient(0, 0, sky.width, sky.height);
+          grad.addColorStop(0, 'rgba(30, 15, 65, 0.9)');
+          grad.addColorStop(0.6, 'rgba(20, 5, 35, 0.5)');
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, sky.width, sky.height);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+  }
+
   /* ============================================
      CANVAS ECLIPSE GENERATOR
   ============================================ */
@@ -611,6 +632,7 @@
       const sCy = sSize / 2;
       const sGrad = sCtx.createRadialGradient(sCx, sCy, 0, sCx, sCy, sSize / 2);
 
+      // TIGHTENED CORONA GRADIENT
       sGrad.addColorStop(0, '#ffffff');
       sGrad.addColorStop(0.48, '#ffffff'); 
       sGrad.addColorStop(0.505, '#ffffff'); 
@@ -730,10 +752,11 @@
         const delay = (Math.random() * 4).toFixed(2);
         const color = starColors[Math.floor(Math.random() * starColors.length)];
         
-        starWrapper.style.cssText = `left: ${left.toFixed(2)}%; top: ${top.toFixed(2)}%; animation-delay: ${delay}s; color: ${color};`;
+        starWrapper.style.cssText = `left: ${left.toFixed(2)}%; top: ${top.toFixed(2)}%; animation-delay: ${delay}s; color: ${color}; filter: drop-shadow(0 0 5px ${color});`;
         
         const starCore = document.createElement('div');
         starCore.className = 'star-refined';
+        starCore.style.backgroundColor = '#ffffff'; 
         
         starWrapper.appendChild(starCore);
         frag.appendChild(starWrapper);
@@ -880,6 +903,7 @@
   ============================================ */
   window.addEventListener('DOMContentLoaded', () => {
     buildCanvasFlares(); // Generate flares on canvases to bypass Dark Mode bug
+    initSkyCanvas();
     drawEclipseElements();
     initAurora();
     buildStarfield();
@@ -905,4 +929,74 @@
     } else {
       frame.style.setProperty('--ar', aspects[i % aspects.length]);
       frame.innerHTML = `
-        <svg width="22" height="22" viewBox="0 0 26 26" fill="n
+        <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
+          <circle cx="13" cy="13" r="11.5" stroke="#8f8a97" stroke-width="1"/>
+          <circle cx="13" cy="13" r="6" fill="#8f8a97"/>
+        </svg>
+        <span>awaiting</span>`;
+    }
+    grid.appendChild(frame);
+  });
+
+  if (reduceMotion) {
+    document.querySelectorAll('.frame').forEach(f => f.classList.add('visible'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.frame').forEach(f => io.observe(f));
+  }
+
+  /* ============================================
+     LIGHTBOX CONTROLLER
+  ============================================ */
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbCaption = document.getElementById('lbCaption');
+  const lbPrev = document.getElementById('lbPrev');
+  const lbNext = document.getElementById('lbNext');
+  let currentIndex = 0;
+
+  function openLightbox(index) {
+    if (usingPlaceholders) return;
+    currentIndex = index;
+    showPhoto();
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden', 'false');
+  }
+
+  function showPhoto() {
+    const p = photos[currentIndex];
+    lbImg.src = p.src;
+    lbImg.alt = p.caption || '';
+    lbCaption.textContent = p.caption || '';
+    const multi = photos.length > 1;
+    lbPrev.style.display = multi ? 'block' : 'none';
+    lbNext.style.display = multi ? 'block' : 'none';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden', 'true');
+  }
+
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+  lbPrev.addEventListener('click', () => { currentIndex = (currentIndex - 1 + photos.length) % photos.length; showPhoto(); });
+  lbNext.addEventListener('click', () => { currentIndex = (currentIndex + 1) % photos.length; showPhoto(); });
+
+  window.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lbPrev.click();
+    if (e.key === 'ArrowRight') lbNext.click();
+  });
+
+</script>
+</body>
+</html>
