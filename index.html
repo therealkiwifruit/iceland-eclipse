@@ -10,6 +10,7 @@
 <title>Sarra - Eclipse 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Ultra-light weights (100, 200) added for supreme elegance -->
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@100;200;300;400;500&display=swap" rel="stylesheet">
 <style>
   /* ============================================
@@ -44,6 +45,11 @@
     min-height: 100vh;
   }
 
+  ::selection { 
+    background: #f2c879; 
+    color: var(--void); 
+  }
+
   /* ============================================
      2. DYNAMIC PARALLAX SKY BACKGROUND
   ============================================ */
@@ -60,20 +66,18 @@
     perspective: 1000px;
   }
 
-  /* Deep purple sky illumination */
+  /* Canvas Sky - Immune to CSS Overrides */
   .sky-light-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(30, 15, 65, 0.9) 0%, rgba(20, 5, 35, 0.5) 60%, transparent 100%);
+    width: 100%;
+    height: 100%;
     opacity: var(--bg-flare, 0); 
     will-change: opacity;
     z-index: 0;
   }
 
-  /* 
-     LIVING CANVAS AURORA 
-     Remains visible during the gallery, swaying softly in the deep background.
-  */
+  /* Canvas Aurora - Engine Immune */
   .aurora-canvas {
     position: absolute;
     inset: 0;
@@ -110,7 +114,8 @@
   .star-refined {
     width: 100%;
     height: 100%;
-    background-color: #ffffff; /* Samsung-safe pure white */
+    background-color: #ffffff; 
+    box-shadow: 0 0 2px #ffffff;
     clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
   }
   
@@ -140,7 +145,7 @@
 
   .hero-wrap {
     position: relative;
-    height: 130vh;
+    height: 120vh;
   }
 
   .hero-sticky {
@@ -149,22 +154,24 @@
     height: 100vh;
     width: 100%;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background: transparent; 
   }
 
+  /* 
+     ABSOLUTE POSITIONING SYSTEM:
+     Completely detaches Eclipse from Text.
+     They will never overlap or smush ever again.
+  */
   .eclipse-system {
-    position: relative;
+    position: absolute;
+    top: 40%; /* Pinned to upper middle */
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: min(45vmin, 340px);
     height: min(45vmin, 340px);
-    margin-bottom: 0; /* Handled by text-block margin now */
     z-index: 2;
   }
 
-  /* CANVAS ELEMENTS: 100% engine immune */
   .sun-canvas {
     position: absolute;
     top: -50%;
@@ -188,59 +195,34 @@
   }
 
   /* ============================================
-     4. PHYSICS-ACCURATE LENS FLARE SYSTEM
-     Rebuilt using radial-gradient to bypass Samsung's 
-     box-shadow inversion bug completely.
+     4. LENS FLARE PHYSICS ENGINE
+     A single full-screen canvas that draws all flares mathematically.
+     ZERO overlapping DOM elements. ZERO mix-blend-mode layout bugs.
   ============================================ */
   .flare-system {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     pointer-events: none;
     z-index: 20;
+    mix-blend-mode: screen;
     opacity: var(--flare-op, 0); 
     will-change: opacity;
   }
 
-  .flare-artifact {
-    position: absolute;
-    top: 50%; left: 50%;
-    border-radius: 9999px;
-    will-change: transform;
-    mix-blend-mode: screen;
-    transform: translate(calc(-50% + var(--lx) * var(--scale)), calc(-50% + var(--ly) * var(--scale)));
-  }
-
-  .flare-streak {
-    width: 150vw; height: 2px;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,220,180,0.1) 40%, rgba(255,255,255,0.9) 50%, rgba(255,220,180,0.1) 60%, transparent 100%);
-    --scale: 1; 
-    transform: translate(calc(-50% + var(--lx) * var(--scale)), calc(-50% + var(--ly) * var(--scale))) rotate(-15deg);
-  }
-
-  .flare-burst {
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, #ffffff 0%, rgba(255,200,100,0.4) 15%, transparent 50%);
-    --scale: 1;
-  }
-
-  /* Radial gradient rings: safe on all dark modes */
-  .flare-1 { width: 150px; height: 150px; background: radial-gradient(circle, transparent 40%, rgba(190,190,240,0.2) 50%, transparent 60%); --scale: -0.5; }
-  .flare-2 { width: 300px; height: 300px; background: radial-gradient(circle, transparent 45%, rgba(200,230,200,0.15) 50%, transparent 55%); --scale: -1.2; }
-  .flare-3 { width: 700px; height: 700px; background: radial-gradient(circle, transparent 48%, rgba(255,50,50,0.1) 50%, transparent 52%); --scale: -2.2; }
-  .flare-4 { width: 120px; height: 120px; background: radial-gradient(circle, transparent 30%, rgba(50,180,50,0.2) 50%, transparent 70%); --scale: 0.8; }
-  .flare-5 { width: 80px; height: 80px;   background: radial-gradient(circle, rgba(200,220,80,0.2) 0%, transparent 60%); --scale: 0.3; }
-
   /* ============================================
      5. TYPOGRAPHY & UI POSITIONING
   ============================================ */
-  /* Grouped text block to control layout as one unit */
   .text-block {
+    position: absolute;
+    top: 72%; /* Pinned to the lower quarter, safely below the sun */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
     text-align: center;
     padding: 0 24px;
     opacity: calc(1 - var(--fade-text, 0));
     will-change: opacity;
     z-index: 5; 
-    margin-top: 5vh; /* Mobile Spacing */
   }
 
   .eyebrow {
@@ -254,7 +236,7 @@
   .title {
     font-family: 'Jost', sans-serif;
     font-size: clamp(3.5rem, 11vw, 6.5rem);
-    font-weight: 200; /* Ultra elegant thin weight */
+    font-weight: 100; /* Super slim weight */
     letter-spacing: 0.15em; 
     line-height: 1;
     color: var(--starlight);
@@ -270,7 +252,7 @@
 
   .scroll-cue {
     position: absolute;
-    bottom: 8vh; 
+    bottom: 6vh; 
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -300,14 +282,11 @@
     50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
   }
 
-  /* DESKTOP LAYOUT ADJUSTMENTS */
+  /* Desktop-Specific Spacing adjustments */
   @media (min-width: 768px) {
-    .eclipse-system {
-       transform: translateY(-5vh); /* Lifts sun slightly */
-    }
-    .text-block {
-       margin-top: 12vh; /* Pushes text securely down, away from the sun */
-    }
+    .eclipse-system { top: 40%; }
+    .text-block { top: 76%; } /* Pushed safely lower on massive screens */
+    .scroll-cue { bottom: 6vh; }
   }
 
   /* ============================================
@@ -389,7 +368,7 @@
   }
 
   /* ============================================
-     7. LIGHTBOX & ACCESSIBILITY
+     7. LIGHTBOX
   ============================================ */
   .lightbox {
     position: fixed;
@@ -458,43 +437,27 @@
 </head>
 <body>
 
-  <!-- BACKGROUND PARALLAX LAYER CONTAINER -->
   <div class="sky-parallax-container">
-      <div class="sky-light-overlay"></div>
-      
-      <!-- LIVING AURORA CANVAS -->
+      <canvas id="skyLightOverlay" class="sky-light-overlay"></canvas>
       <canvas id="auroraCanvas" class="aurora-canvas"></canvas>
-
       <div class="parallax-layer layer-background"></div>
       <div class="parallax-layer layer-midground"></div>
       <div class="parallax-layer layer-foreground"></div>
   </div>
 
-  <!-- FOREGROUND CONTENT WRAPPER -->
   <main class="site-content">
     
-    <!-- PHYSICS-ACCURATE LENS FLARE SYSTEM -->
-    <div class="flare-system" id="flareSystem">
-        <div class="flare-artifact flare-streak"></div>
-        <div class="flare-artifact flare-burst"></div>
-        <div class="flare-artifact flare-1"></div>
-        <div class="flare-artifact flare-2"></div>
-        <div class="flare-artifact flare-3"></div>
-        <div class="flare-artifact flare-4"></div>
-        <div class="flare-artifact flare-5"></div>
-    </div>
+    <!-- SINGLE CANVAS FOR ALL FLARES - IMMUNE TO MOBILE DROPOUT BUGS -->
+    <canvas class="flare-system" id="flareCanvas"></canvas>
 
     <section class="hero-wrap" id="heroWrap">
       <div class="hero-sticky" id="heroSticky">
-        <div class="eclipse-system">
-          
-          <!-- CANVAS RENDERED ECLIPSE -->
+        
+        <div class="eclipse-system" id="eclipseSystem">
           <canvas id="sunCanvas" class="sun-canvas"></canvas>
           <canvas id="moonCanvas" class="moon-canvas"></canvas>
-          
         </div>
         
-        <!-- GROUPED TEXT BLOCK FOR PERFECT RESPONSIVE POSITIONING -->
         <div class="text-block">
           <p class="eyebrow">Iceland &middot; 2026</p>
           <h1 class="title">Sarra</h1>
@@ -528,7 +491,6 @@
 
   </main>
 
-  <!-- LIGHTBOX -->
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" id="lbClose" aria-label="Close">&times;</button>
     <button class="lightbox-prev" id="lbPrev" aria-label="Previous photo">&lsaquo;</button>
@@ -540,9 +502,6 @@
   </div>
 
 <script>
-  /* ============================================
-     PHOTO CONFIGURATION
-  ============================================ */
   const photos = [
     { src: "images/photo-01.jpg", caption: "" },
     { src: "images/photo-02.jpg", caption: "" },
@@ -567,9 +526,27 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ============================================
-     CANVAS ECLIPSE GENERATOR
-     Compressed corona gradient to hug the sun tighter.
+     CANVAS ELEMENTS INITIALIZATION
   ============================================ */
+  
+  function initSkyCanvas() {
+      const sky = document.getElementById('skyLightOverlay');
+      if (!sky) return;
+      const ctx = sky.getContext('2d');
+      function resize() {
+          sky.width = window.innerWidth * 1.2;
+          sky.height = window.innerHeight * 1.3;
+          const grad = ctx.createLinearGradient(0, 0, sky.width, sky.height);
+          grad.addColorStop(0, 'rgba(30, 15, 65, 0.9)');
+          grad.addColorStop(0.6, 'rgba(20, 5, 35, 0.5)');
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, sky.width, sky.height);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+  }
+
   function drawEclipseElements() {
       const sunCanvas = document.getElementById('sunCanvas');
       if (!sunCanvas) return;
@@ -582,7 +559,7 @@
       const sCy = sSize / 2;
       const sGrad = sCtx.createRadialGradient(sCx, sCy, 0, sCx, sCy, sSize / 2);
 
-      // TIGHTENED CORONA GRADIENT
+      // Tight, intense corona gradient
       sGrad.addColorStop(0, '#ffffff');
       sGrad.addColorStop(0.48, '#ffffff'); 
       sGrad.addColorStop(0.505, '#ffffff'); 
@@ -638,7 +615,6 @@
           ctx.clearRect(0, 0, w, h);
           ctx.globalCompositeOperation = 'screen';
           
-          // Blob 1: Cyan/Green
           let x1 = w * 0.3 + Math.sin(t * 0.5) * w * 0.2;
           let y1 = h * 0.6 + Math.cos(t * 0.3) * h * 0.2;
           let r1 = w * 0.4;
@@ -648,7 +624,6 @@
           ctx.fillStyle = g1;
           ctx.fillRect(0, 0, w, h);
 
-          // Blob 2: Pink/Magenta
           let x2 = w * 0.7 + Math.cos(t * 0.4) * w * 0.2;
           let y2 = h * 0.5 + Math.sin(t * 0.6) * h * 0.2;
           let r2 = w * 0.5;
@@ -658,7 +633,6 @@
           ctx.fillStyle = g2;
           ctx.fillRect(0, 0, w, h);
 
-          // Blob 3: Deep Blue/Violet
           let x3 = w * 0.5 + Math.sin(t * 0.2) * w * 0.3;
           let y3 = h * 0.8 + Math.cos(t * 0.5) * h * 0.1;
           let r3 = w * 0.6;
@@ -672,6 +646,52 @@
           requestAnimationFrame(draw);
       }
       draw();
+  }
+
+  /* ============================================
+     THE LENS FLARE PHYSICS ENGINE
+     Pre-caches all artifacts into offscreen canvases 
+     to guarantee 60fps performance and dodge CSS bugs.
+  ============================================ */
+  const flareCache = {};
+  
+  function createFlareCache() {
+      // 1. Anamorphic Streak
+      const sc = document.createElement('canvas');
+      sc.width = 3000; sc.height = 4;
+      const sCtx = sc.getContext('2d');
+      const sGrad = sCtx.createLinearGradient(0, 0, 3000, 0);
+      sGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      sGrad.addColorStop(0.4, 'rgba(255,220,180,0.1)');
+      sGrad.addColorStop(0.5, 'rgba(255,255,255,0.9)');
+      sGrad.addColorStop(0.6, 'rgba(255,220,180,0.1)');
+      sGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      sCtx.fillStyle = sGrad;
+      sCtx.fillRect(0, 0, 3000, 4);
+      flareCache['streak'] = sc;
+
+      // Reusable ring generator
+      function makeRing(id, size, stops) {
+          const c = document.createElement('canvas');
+          c.width = size; c.height = size;
+          const ctx = c.getContext('2d');
+          const grad = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+          stops.forEach(s => grad.addColorStop(s[0], s[1]));
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, size, size);
+          flareCache[id] = c;
+      }
+
+      // 2. Central Burst
+      makeRing('burst', 200, [
+          [0, 'rgba(255,255,255,1)'], [0.15, 'rgba(255,200,100,0.4)'], [0.5, 'rgba(0,0,0,0)']
+      ]);
+      // 3. Ghost Reflections
+      makeRing('f1', 150, [[0.4, 'rgba(0,0,0,0)'], [0.5, 'rgba(190,190,240,0.2)'], [0.6, 'rgba(0,0,0,0)']]);
+      makeRing('f2', 300, [[0.45, 'rgba(0,0,0,0)'], [0.5, 'rgba(200,230,200,0.15)'], [0.55, 'rgba(0,0,0,0)']]);
+      makeRing('f3', 700, [[0.48, 'rgba(0,0,0,0)'], [0.5, 'rgba(255,50,50,0.1)'], [0.52, 'rgba(0,0,0,0)']]);
+      makeRing('f4', 120, [[0.3, 'rgba(0,0,0,0)'], [0.5, 'rgba(50,180,50,0.2)'], [0.7, 'rgba(0,0,0,0)']]);
+      makeRing('f5', 80,  [[0, 'rgba(200,220,80,0.2)'], [0.6, 'rgba(0,0,0,0)']]);
   }
 
   /* ============================================
@@ -709,6 +729,7 @@
         
         const starCore = document.createElement('div');
         starCore.className = 'star-refined';
+        starCore.style.backgroundColor = '#ffffff'; 
         
         starWrapper.appendChild(starCore);
         frag.appendChild(starWrapper);
@@ -743,7 +764,6 @@
         }
         frag.appendChild(svg);
       }
-      
       container.appendChild(frag);
     });
   }
@@ -779,12 +799,24 @@
   const root = document.documentElement;
   const moonCanvas = document.getElementById('moonCanvas');
   const heroWrap = document.getElementById('heroWrap');
+  const flareCanvas = document.getElementById('flareCanvas');
+  const fCtx = flareCanvas.getContext('2d');
+  
+  let fw, fh;
+  function resizeFlares() {
+      fw = flareCanvas.width = window.innerWidth;
+      fh = flareCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeFlares);
+  resizeFlares();
+
   let sTicking = false;
 
   function updateEclipse() {
     sTicking = false;
     const scrollY = window.scrollY;
     
+    // Parallax tracking
     root.style.setProperty('--scroll-y', scrollY);
 
     if (reduceMotion) return; 
@@ -801,30 +833,27 @@
     let bgFlare = 0;
     let auroraOp = 0;
 
-    // Phase 1: Totality (p < 0.15)
+    // Timeline phases mapped exactly to scroll depth
     if (p < 0.15) {
         flareOp = 0;
         auroraOp = 0;
-    } 
-    // Phase 2: Reveal & Aurora Fade In (0.15 to 0.7)
-    else if (p >= 0.15 && p < 0.7) {
+    } else if (p >= 0.15 && p < 0.7) {
         flareOp = 1; 
-        auroraOp = (p - 0.15) / 0.55; // Aurora gracefully blooms 0 to 1
-    } 
-    // Phase 3: Enter Gallery (0.7 to 1.0)
-    else if (p >= 0.7) {
-        flareOp = Math.max(0, 1 - ((p - 0.7) / 0.3)); // Sun flare fades out
-        auroraOp = 1; // Aurora REMAINS beautifully visible in the dark background
+        auroraOp = (p - 0.15) / 0.55; 
+    } else if (p >= 0.7) {
+        flareOp = Math.max(0, 1 - ((p - 0.7) / 0.3)); 
+        auroraOp = 1; 
     }
     
     bgFlare = flareOp * 0.9; 
+    root.style.setProperty('--bg-flare', bgFlare.toFixed(3));
+    root.style.setProperty('--aurora-op', auroraOp.toFixed(3));
 
-    // PHYSICS TRACKING: Map the exact pixel coordinates of the sun to the flare engine
-    const eclipseSys = document.querySelector('.eclipse-system');
+    const eclipseSys = document.getElementById('eclipseSystem');
     if (eclipseSys) {
       const eclipseRect = eclipseSys.getBoundingClientRect();
-      const viewportCenterX = window.innerWidth / 2;
-      const viewportCenterY = window.innerHeight / 2;
+      const viewportCenterX = fw / 2;
+      const viewportCenterY = fh / 2;
       
       const sunCenterX = eclipseRect.left + eclipseRect.width / 2;
       const sunCenterY = eclipseRect.top + eclipseRect.height / 2;
@@ -832,13 +861,38 @@
       const lx = sunCenterX - viewportCenterX;
       const ly = sunCenterY - viewportCenterY;
 
-      root.style.setProperty('--lx', lx + 'px');
-      root.style.setProperty('--ly', ly + 'px');
+      // DRAW THE PHYSICS ENGINE FLARE CANVAS
+      fCtx.clearRect(0, 0, fw, fh);
+      if (flareOp > 0) {
+          fCtx.globalAlpha = flareOp;
+          fCtx.globalCompositeOperation = 'screen';
+          
+          function drawA(id, scale, w, h, angle) {
+              const dx = viewportCenterX + lx * scale;
+              const dy = viewportCenterY + ly * scale;
+              if (angle) {
+                  fCtx.save();
+                  fCtx.translate(dx, dy);
+                  fCtx.rotate(angle);
+                  fCtx.drawImage(flareCache[id], -w/2, -h/2, w, h);
+                  fCtx.restore();
+              } else {
+                  fCtx.drawImage(flareCache[id], dx - w/2, dy - h/2, w, h);
+              }
+          }
+          
+          // Draw streak intersecting the sun
+          drawA('streak', 1, 3000, 4, -15 * Math.PI / 180);
+          drawA('burst', 1, 200, 200, 0);
+          
+          // Draw optical ghost reflections sliding along the opposite axis
+          drawA('f1', -0.5, 150, 150, 0);
+          drawA('f2', -1.2, 300, 300, 0);
+          drawA('f3', -2.2, 700, 700, 0);
+          drawA('f4', 0.8, 120, 120, 0);
+          drawA('f5', 0.3, 80, 80, 0);
+      }
     }
-
-    root.style.setProperty('--flare-op', flareOp.toFixed(3));
-    root.style.setProperty('--bg-flare', bgFlare.toFixed(3));
-    root.style.setProperty('--aurora-op', auroraOp.toFixed(3));
     
     const textFade = Math.min(1, scrollY / 300);
     root.style.setProperty('--fade-text', textFade.toFixed(3));
@@ -859,6 +913,8 @@
      INITIALIZATION & OBSERVERS
   ============================================ */
   window.addEventListener('DOMContentLoaded', () => {
+    createFlareCache(); // Build the offscreen optics textures
+    initSkyCanvas();
     drawEclipseElements();
     initAurora();
     buildStarfield();
