@@ -3,22 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- STRICT DARK MODE ENFORCEMENT -->
-<meta name="color-scheme" content="dark">
+<!-- STRICT DARK MODE ENFORCEMENT: Tells Samsung Internet to back off -->
+<meta name="color-scheme" content="only dark">
 <meta name="theme-color" content="#000000">
 <meta name="robots" content="noindex, nofollow">
 <title>Sarra - Eclipse 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Ultra-light weights (100, 200) added for supreme elegance -->
+<!-- Imported 100 and 200 weights for ultra-thin elegance -->
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@100;200;300;400;500&display=swap" rel="stylesheet">
 <style>
   /* ============================================
      1. DESIGN TOKENS & CORE RESET
   ============================================ */
   :root {
-    color-scheme: dark; 
+    color-scheme: only dark; 
     --void: #000000;        
+    --corona: #f2c879;      
+    --ember: #ff8a5b;       
     --starlight: #eef0f7;   
     --muted: #8f8a97;       
     --hairline: rgba(238, 240, 247, 0.12);
@@ -66,18 +68,15 @@
     perspective: 1000px;
   }
 
-  /* Canvas Sky - Immune to CSS Overrides */
   .sky-light-overlay {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
+    background: linear-gradient(135deg, rgba(30, 15, 65, 0.9) 0%, rgba(20, 5, 35, 0.5) 60%, transparent 100%);
     opacity: var(--bg-flare, 0); 
     will-change: opacity;
     z-index: 0;
   }
 
-  /* Canvas Aurora - Engine Immune */
   .aurora-canvas {
     position: absolute;
     inset: 0;
@@ -145,30 +144,32 @@
 
   .hero-wrap {
     position: relative;
-    height: 120vh;
+    height: 130vh;
   }
 
+  /* FLUID FLEXBOX LAYOUT: Completely eliminates overlapping elements on any screen */
   .hero-sticky {
     position: sticky;
     top: 0;
     height: 100vh;
     width: 100%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background: transparent; 
   }
 
-  /* 
-     ABSOLUTE POSITIONING SYSTEM:
-     Completely detaches Eclipse from Text.
-     They will never overlap or smush ever again.
-  */
+  /* Elastic Spacers to distribute content dynamically */
+  .layout-spacer {
+    width: 100%;
+  }
+
   .eclipse-system {
-    position: absolute;
-    top: 40%; /* Pinned to upper middle */
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
     width: min(45vmin, 340px);
     height: min(45vmin, 340px);
+    flex-shrink: 0;
     z-index: 2;
   }
 
@@ -196,33 +197,79 @@
 
   /* ============================================
      4. LENS FLARE PHYSICS ENGINE
-     A single full-screen canvas that draws all flares mathematically.
-     ZERO overlapping DOM elements. ZERO mix-blend-mode layout bugs.
+     Restored HTML elements, but uses radial-gradients 
+     instead of box-shadows to completely defeat the 
+     Samsung Dark Mode inversion bug.
   ============================================ */
   .flare-system {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     pointer-events: none;
     z-index: 20;
-    mix-blend-mode: screen;
     opacity: var(--flare-op, 0); 
     will-change: opacity;
+  }
+
+  .flare-artifact {
+    position: absolute;
+    top: 50%; left: 50%;
+    border-radius: 9999px;
+    will-change: transform;
+    mix-blend-mode: screen;
+    /* Travels exactly along the optical axis, scaling appropriately */
+    transform: translate(calc(-50% + var(--lx) * var(--scale)), calc(-50% + var(--ly) * var(--scale)));
+  }
+
+  .flare-streak {
+    width: 150vw; height: 3px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,220,180,0.1) 40%, rgba(255,255,255,0.9) 50%, rgba(255,220,180,0.1) 60%, transparent 100%);
+    --scale: 1; 
+    transform: translate(calc(-50% + var(--lx) * var(--scale)), calc(-50% + var(--ly) * var(--scale))) rotate(-15deg);
+  }
+
+  /* Gradients mimic glass scattering and bypass shadow-inversion bugs */
+  .flare-burst {
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,200,100,0.6) 15%, transparent 60%);
+    --scale: 1;
+  }
+
+  .flare-1 { 
+    width: 150px; height: 150px; 
+    background: radial-gradient(circle, transparent 40%, rgba(190,190,240,0.2) 50%, transparent 60%); 
+    --scale: -0.5; 
+  }
+  .flare-2 { 
+    width: 300px; height: 300px; 
+    background: radial-gradient(circle, transparent 45%, rgba(200,230,200,0.15) 50%, transparent 55%); 
+    --scale: -1.2; 
+  }
+  .flare-3 { 
+    width: 700px; height: 700px; 
+    background: radial-gradient(circle, transparent 48%, rgba(255,50,50,0.1) 50%, transparent 52%); 
+    --scale: -2.2; 
+  }
+  .flare-4 { 
+    width: 120px; height: 120px; 
+    background: radial-gradient(circle, transparent 30%, rgba(50,180,50,0.2) 50%, transparent 70%); 
+    --scale: 0.8; 
+  }
+  .flare-5 { 
+    width: 80px; height: 80px;   
+    background: radial-gradient(circle, rgba(200,220,80,0.3) 0%, transparent 60%); 
+    --scale: 0.3; 
   }
 
   /* ============================================
      5. TYPOGRAPHY & UI POSITIONING
   ============================================ */
   .text-block {
-    position: absolute;
-    top: 72%; /* Pinned to the lower quarter, safely below the sun */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
     text-align: center;
     padding: 0 24px;
     opacity: calc(1 - var(--fade-text, 0));
     will-change: opacity;
     z-index: 5; 
+    flex-shrink: 0;
   }
 
   .eyebrow {
@@ -233,10 +280,11 @@
     margin-bottom: 12px;
   }
 
+  /* Super thin (weight 200), tracked-out elegance */
   .title {
     font-family: 'Jost', sans-serif;
     font-size: clamp(3.5rem, 11vw, 6.5rem);
-    font-weight: 100; /* Super slim weight */
+    font-weight: 200; 
     letter-spacing: 0.15em; 
     line-height: 1;
     color: var(--starlight);
@@ -251,10 +299,6 @@
   }
 
   .scroll-cue {
-    position: absolute;
-    bottom: 6vh; 
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -262,6 +306,8 @@
     opacity: calc(1 - var(--fade-text, 0) * 3);
     color: var(--muted);
     z-index: 5;
+    flex-shrink: 0;
+    margin-bottom: 6vh;
   }
 
   .scroll-cue span {
@@ -280,13 +326,6 @@
   @keyframes dropline {
     0%, 100% { transform: scaleY(0.3); transform-origin: top; opacity: 0.4; }
     50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
-  }
-
-  /* Desktop-Specific Spacing adjustments */
-  @media (min-width: 768px) {
-    .eclipse-system { top: 40%; }
-    .text-block { top: 76%; } /* Pushed safely lower on massive screens */
-    .scroll-cue { bottom: 6vh; }
   }
 
   /* ============================================
@@ -438,8 +477,9 @@
 <body>
 
   <div class="sky-parallax-container">
-      <canvas id="skyLightOverlay" class="sky-light-overlay"></canvas>
+      <div id="skyLightOverlay" class="sky-light-overlay"></div>
       <canvas id="auroraCanvas" class="aurora-canvas"></canvas>
+
       <div class="parallax-layer layer-background"></div>
       <div class="parallax-layer layer-midground"></div>
       <div class="parallax-layer layer-foreground"></div>
@@ -447,27 +487,43 @@
 
   <main class="site-content">
     
-    <!-- SINGLE CANVAS FOR ALL FLARES - IMMUNE TO MOBILE DROPOUT BUGS -->
-    <canvas class="flare-system" id="flareCanvas"></canvas>
+    <!-- RESTORED HTML FLARES - Responds perfectly to CSS Transforms -->
+    <div class="flare-system" id="flareSystem">
+        <div class="flare-artifact flare-streak"></div>
+        <div class="flare-artifact flare-burst"></div>
+        <div class="flare-artifact flare-1"></div>
+        <div class="flare-artifact flare-2"></div>
+        <div class="flare-artifact flare-3"></div>
+        <div class="flare-artifact flare-4"></div>
+        <div class="flare-artifact flare-5"></div>
+    </div>
 
     <section class="hero-wrap" id="heroWrap">
       <div class="hero-sticky" id="heroSticky">
         
+        <!-- FLEXBOX SPACERS: Guarantees perfect layout across all devices -->
+        <div class="layout-spacer" style="flex: 0.6;"></div>
+
         <div class="eclipse-system" id="eclipseSystem">
           <canvas id="sunCanvas" class="sun-canvas"></canvas>
           <canvas id="moonCanvas" class="moon-canvas"></canvas>
         </div>
         
+        <div class="layout-spacer" style="flex: 0.5;"></div>
+
         <div class="text-block">
           <p class="eyebrow">Iceland &middot; 2026</p>
           <h1 class="title">Sarra</h1>
           <p class="tagline">totality, and everything after</p>
         </div>
         
+        <div class="layout-spacer" style="flex: 1;"></div>
+        
         <div class="scroll-cue">
           <span>Scroll</span>
           <div class="line"></div>
         </div>
+
       </div>
     </section>
 
@@ -526,27 +582,9 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ============================================
-     CANVAS ELEMENTS INITIALIZATION
+     CANVAS ECLIPSE GENERATOR
+     Compressed edge glow for precise realism.
   ============================================ */
-  
-  function initSkyCanvas() {
-      const sky = document.getElementById('skyLightOverlay');
-      if (!sky) return;
-      const ctx = sky.getContext('2d');
-      function resize() {
-          sky.width = window.innerWidth * 1.2;
-          sky.height = window.innerHeight * 1.3;
-          const grad = ctx.createLinearGradient(0, 0, sky.width, sky.height);
-          grad.addColorStop(0, 'rgba(30, 15, 65, 0.9)');
-          grad.addColorStop(0.6, 'rgba(20, 5, 35, 0.5)');
-          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-          ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, sky.width, sky.height);
-      }
-      window.addEventListener('resize', resize);
-      resize();
-  }
-
   function drawEclipseElements() {
       const sunCanvas = document.getElementById('sunCanvas');
       if (!sunCanvas) return;
@@ -559,14 +597,14 @@
       const sCy = sSize / 2;
       const sGrad = sCtx.createRadialGradient(sCx, sCy, 0, sCx, sCy, sSize / 2);
 
-      // Tight, intense corona gradient
+      // TIGHTENED CORONA GRADIENT: Fades to black exactly 5% faster
       sGrad.addColorStop(0, '#ffffff');
       sGrad.addColorStop(0.48, '#ffffff'); 
       sGrad.addColorStop(0.505, '#ffffff'); 
       sGrad.addColorStop(0.53, '#f2d299');  
-      sGrad.addColorStop(0.60, '#e67345');  
-      sGrad.addColorStop(0.75, 'rgba(80, 15, 20, 0.4)'); 
-      sGrad.addColorStop(0.90, 'rgba(0, 0, 0, 0)');
+      sGrad.addColorStop(0.58, '#e67345');  
+      sGrad.addColorStop(0.70, 'rgba(80, 15, 20, 0.4)'); 
+      sGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0)');
 
       sCtx.fillStyle = sGrad;
       sCtx.fillRect(0, 0, sSize, sSize);
@@ -649,52 +687,6 @@
   }
 
   /* ============================================
-     THE LENS FLARE PHYSICS ENGINE
-     Pre-caches all artifacts into offscreen canvases 
-     to guarantee 60fps performance and dodge CSS bugs.
-  ============================================ */
-  const flareCache = {};
-  
-  function createFlareCache() {
-      // 1. Anamorphic Streak
-      const sc = document.createElement('canvas');
-      sc.width = 3000; sc.height = 4;
-      const sCtx = sc.getContext('2d');
-      const sGrad = sCtx.createLinearGradient(0, 0, 3000, 0);
-      sGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      sGrad.addColorStop(0.4, 'rgba(255,220,180,0.1)');
-      sGrad.addColorStop(0.5, 'rgba(255,255,255,0.9)');
-      sGrad.addColorStop(0.6, 'rgba(255,220,180,0.1)');
-      sGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      sCtx.fillStyle = sGrad;
-      sCtx.fillRect(0, 0, 3000, 4);
-      flareCache['streak'] = sc;
-
-      // Reusable ring generator
-      function makeRing(id, size, stops) {
-          const c = document.createElement('canvas');
-          c.width = size; c.height = size;
-          const ctx = c.getContext('2d');
-          const grad = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
-          stops.forEach(s => grad.addColorStop(s[0], s[1]));
-          ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, size, size);
-          flareCache[id] = c;
-      }
-
-      // 2. Central Burst
-      makeRing('burst', 200, [
-          [0, 'rgba(255,255,255,1)'], [0.15, 'rgba(255,200,100,0.4)'], [0.5, 'rgba(0,0,0,0)']
-      ]);
-      // 3. Ghost Reflections
-      makeRing('f1', 150, [[0.4, 'rgba(0,0,0,0)'], [0.5, 'rgba(190,190,240,0.2)'], [0.6, 'rgba(0,0,0,0)']]);
-      makeRing('f2', 300, [[0.45, 'rgba(0,0,0,0)'], [0.5, 'rgba(200,230,200,0.15)'], [0.55, 'rgba(0,0,0,0)']]);
-      makeRing('f3', 700, [[0.48, 'rgba(0,0,0,0)'], [0.5, 'rgba(255,50,50,0.1)'], [0.52, 'rgba(0,0,0,0)']]);
-      makeRing('f4', 120, [[0.3, 'rgba(0,0,0,0)'], [0.5, 'rgba(50,180,50,0.2)'], [0.7, 'rgba(0,0,0,0)']]);
-      makeRing('f5', 80,  [[0, 'rgba(200,220,80,0.2)'], [0.6, 'rgba(0,0,0,0)']]);
-  }
-
-  /* ============================================
      DYNAMIC DENSITY STARFIELD & BRIDGES
   ============================================ */
   function buildStarfield() {
@@ -725,11 +717,10 @@
         const delay = (Math.random() * 4).toFixed(2);
         const color = starColors[Math.floor(Math.random() * starColors.length)];
         
-        starWrapper.style.cssText = `left: ${left.toFixed(2)}%; top: ${top.toFixed(2)}%; animation-delay: ${delay}s; color: ${color}; filter: drop-shadow(0 0 5px ${color});`;
+        starWrapper.style.cssText = `left: ${left.toFixed(2)}%; top: ${top.toFixed(2)}%; animation-delay: ${delay}s; color: ${color};`;
         
         const starCore = document.createElement('div');
         starCore.className = 'star-refined';
-        starCore.style.backgroundColor = '#ffffff'; 
         
         starWrapper.appendChild(starCore);
         frag.appendChild(starWrapper);
@@ -764,6 +755,7 @@
         }
         frag.appendChild(svg);
       }
+      
       container.appendChild(frag);
     });
   }
@@ -794,29 +786,18 @@
   }
 
   /* ============================================
-     CINEMATIC ECLIPSE & LENS FLARE PHYSICS
+     CINEMATIC ECLIPSE & LENS FLARE SWEEP PHYSICS
   ============================================ */
   const root = document.documentElement;
   const moonCanvas = document.getElementById('moonCanvas');
   const heroWrap = document.getElementById('heroWrap');
-  const flareCanvas = document.getElementById('flareCanvas');
-  const fCtx = flareCanvas.getContext('2d');
-  
-  let fw, fh;
-  function resizeFlares() {
-      fw = flareCanvas.width = window.innerWidth;
-      fh = flareCanvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resizeFlares);
-  resizeFlares();
-
   let sTicking = false;
 
   function updateEclipse() {
     sTicking = false;
     const scrollY = window.scrollY;
     
-    // Parallax tracking
+    // Set scroll property for mobile background parallax tracking
     root.style.setProperty('--scroll-y', scrollY);
 
     if (reduceMotion) return; 
@@ -826,6 +807,7 @@
     
     const maxOffset = window.innerWidth <= 640 ? 120 : 250;
     
+    // Moon starts at perfect 0,0 (Totality)
     let moonX = p * maxOffset; 
     let moonY = p * (maxOffset * 0.3); 
 
@@ -833,7 +815,7 @@
     let bgFlare = 0;
     let auroraOp = 0;
 
-    // Timeline phases mapped exactly to scroll depth
+    // Timeline phases
     if (p < 0.15) {
         flareOp = 0;
         auroraOp = 0;
@@ -846,53 +828,23 @@
     }
     
     bgFlare = flareOp * 0.9; 
+
+    // SWEEPING PHYSICS: Dynamically shifts the optical center of the lens flare 
+    // to simulate the camera dragging across the sun, creating the beautiful moving ghost rings.
+    let sweepProgress = 0;
+    if (p >= 0.15) {
+        sweepProgress = (p - 0.15) / 0.85; // 0 to 1 as you scroll past the reveal
+    }
+    
+    // Lens flares will sweep elegantly from top-left to bottom-right
+    const lx = sweepProgress * window.innerWidth * 0.4;
+    const ly = sweepProgress * window.innerHeight * 0.4;
+
+    root.style.setProperty('--flare-op', flareOp.toFixed(3));
     root.style.setProperty('--bg-flare', bgFlare.toFixed(3));
     root.style.setProperty('--aurora-op', auroraOp.toFixed(3));
-
-    const eclipseSys = document.getElementById('eclipseSystem');
-    if (eclipseSys) {
-      const eclipseRect = eclipseSys.getBoundingClientRect();
-      const viewportCenterX = fw / 2;
-      const viewportCenterY = fh / 2;
-      
-      const sunCenterX = eclipseRect.left + eclipseRect.width / 2;
-      const sunCenterY = eclipseRect.top + eclipseRect.height / 2;
-      
-      const lx = sunCenterX - viewportCenterX;
-      const ly = sunCenterY - viewportCenterY;
-
-      // DRAW THE PHYSICS ENGINE FLARE CANVAS
-      fCtx.clearRect(0, 0, fw, fh);
-      if (flareOp > 0) {
-          fCtx.globalAlpha = flareOp;
-          fCtx.globalCompositeOperation = 'screen';
-          
-          function drawA(id, scale, w, h, angle) {
-              const dx = viewportCenterX + lx * scale;
-              const dy = viewportCenterY + ly * scale;
-              if (angle) {
-                  fCtx.save();
-                  fCtx.translate(dx, dy);
-                  fCtx.rotate(angle);
-                  fCtx.drawImage(flareCache[id], -w/2, -h/2, w, h);
-                  fCtx.restore();
-              } else {
-                  fCtx.drawImage(flareCache[id], dx - w/2, dy - h/2, w, h);
-              }
-          }
-          
-          // Draw streak intersecting the sun
-          drawA('streak', 1, 3000, 4, -15 * Math.PI / 180);
-          drawA('burst', 1, 200, 200, 0);
-          
-          // Draw optical ghost reflections sliding along the opposite axis
-          drawA('f1', -0.5, 150, 150, 0);
-          drawA('f2', -1.2, 300, 300, 0);
-          drawA('f3', -2.2, 700, 700, 0);
-          drawA('f4', 0.8, 120, 120, 0);
-          drawA('f5', 0.3, 80, 80, 0);
-      }
-    }
+    root.style.setProperty('--lx', lx + 'px');
+    root.style.setProperty('--ly', ly + 'px');
     
     const textFade = Math.min(1, scrollY / 300);
     root.style.setProperty('--fade-text', textFade.toFixed(3));
@@ -913,8 +865,6 @@
      INITIALIZATION & OBSERVERS
   ============================================ */
   window.addEventListener('DOMContentLoaded', () => {
-    createFlareCache(); // Build the offscreen optics textures
-    initSkyCanvas();
     drawEclipseElements();
     initAurora();
     buildStarfield();
