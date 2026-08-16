@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- STRICT DARK MODE ENFORCEMENT: Tells Samsung Internet to back off -->
+<!-- STRICT DARK MODE ENFORCEMENT -->
 <meta name="color-scheme" content="only dark">
 <meta name="theme-color" content="#000000">
 <meta name="robots" content="noindex, nofollow">
@@ -154,12 +154,13 @@
   }
 
   /* 
-     RESTORED ABSOLUTE POSITIONING
-     Perfectly anchors the Sun and the Text independently
+     EXPLICIT ABSOLUTE POSITIONING
+     Perfectly anchors the Sun, Text, and Scroll cues.
+     They will not crash into each other.
   */
   .eclipse-system {
     position: absolute;
-    top: 40%;
+    top: 35%; /* Higher up for mobile */
     left: 50%;
     transform: translate(-50%, -50%);
     width: min(45vmin, 340px);
@@ -167,32 +168,31 @@
     z-index: 2;
   }
 
-  .sun-canvas {
+  .sun-canvas, .moon-canvas {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    inset: -1px;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
     pointer-events: none;
+  }
+
+  .sun-canvas {
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
     mix-blend-mode: screen;
     z-index: 1;
   }
 
   .moon-canvas {
-    position: absolute;
-    inset: -1px; 
-    width: calc(100% + 2px);
-    height: calc(100% + 2px);
     will-change: transform;
     transform: translate3d(0, 0, 0); 
-    pointer-events: none;
     z-index: 2;
   }
 
   /* ============================================
-     4. PHYSICS-ACCURATE LENS FLARE SYSTEM
-     Restored direct optical tracking (--lx/ly) from Sun center.
-     Gradients used to block Samsung inversion bug.
+     4. CANVAS LENS FLARE PHYSICS ENGINE
+     All elements are immune to Samsung dark mode, but
+     still use CSS variables to move perfectly!
   ============================================ */
   .flare-system {
     position: fixed;
@@ -206,67 +206,34 @@
   .flare-artifact {
     position: absolute;
     top: 50%; left: 50%;
-    border-radius: 9999px;
     will-change: transform;
     mix-blend-mode: screen;
-    /* This formula perfectly ties the flare to the optical axis */
+    /* CSS controls the sliding motion perfectly */
     transform: translate(calc(-50% + var(--lx) * var(--scale)), calc(-50% + var(--ly) * var(--scale)));
   }
 
   .flare-streak {
-    width: 150vw; height: 3px;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,220,180,0.1) 40%, rgba(255,255,255,0.9) 50%, rgba(255,220,180,0.1) 60%, transparent 100%);
-    --scale: 1; /* Locked precisely to the sun */
+    width: 3000px; height: 4px;
+    --scale: 1; 
     transform: translate(calc(-50% + var(--lx) * var(--scale)), calc(-50% + var(--ly) * var(--scale))) rotate(-15deg);
   }
 
-  .flare-burst {
-    width: 250px; height: 250px;
-    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,200,100,0.6) 15%, transparent 60%);
-    --scale: 1; /* Locked precisely to the sun */
-  }
-
-  /* Ghost reflections moving along the opposite vector axis */
-  .flare-1 { 
-    width: 150px; height: 150px; 
-    background: radial-gradient(circle, transparent 40%, rgba(190,190,240,0.2) 50%, transparent 60%); 
-    --scale: -0.5; 
-  }
-  .flare-2 { 
-    width: 300px; height: 300px; 
-    background: radial-gradient(circle, transparent 45%, rgba(200,230,200,0.15) 50%, transparent 55%); 
-    --scale: -1.2; 
-  }
-  .flare-3 { 
-    width: 700px; height: 700px; 
-    background: radial-gradient(circle, transparent 48%, rgba(255,50,50,0.1) 50%, transparent 52%); 
-    --scale: -2.2; 
-  }
-  .flare-4 { 
-    width: 120px; height: 120px; 
-    background: radial-gradient(circle, transparent 30%, rgba(50,180,50,0.2) 50%, transparent 70%); 
-    --scale: 0.8; 
-  }
-  .flare-5 { 
-    width: 80px; height: 80px;   
-    background: radial-gradient(circle, rgba(200,220,80,0.3) 0%, transparent 60%); 
-    --scale: 0.3; 
-  }
-  .flare-6 { 
-    width: 40px; height: 40px;   
-    background: radial-gradient(circle, rgba(150,220,220,0.4) 0%, transparent 50%); 
-    --scale: -0.2; 
-  }
+  .flare-burst { width: 250px; height: 250px; --scale: 1; }
+  .flare-1 { width: 150px; height: 150px; --scale: -0.5; }
+  .flare-2 { width: 300px; height: 300px; --scale: -1.2; }
+  .flare-3 { width: 700px; height: 700px; --scale: -2.2; }
+  .flare-4 { width: 120px; height: 120px; --scale: 0.8; }
+  .flare-5 { width: 80px; height: 80px;  --scale: 0.3; }
+  .flare-6 { width: 40px; height: 40px;  --scale: -0.2; }
 
   /* ============================================
      5. TYPOGRAPHY & UI POSITIONING
   ============================================ */
-  /* Restored positioning logic you liked */
   .text-block {
     position: absolute;
-    top: 72%; /* Perfect mobile placement below sun */
+    top: 66%; /* Sits cleanly between Sun and Scroll on Mobile */
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     width: 100%;
     text-align: center;
     padding: 0 24px;
@@ -286,7 +253,7 @@
   .title {
     font-family: 'Jost', sans-serif;
     font-size: clamp(3.5rem, 11vw, 6.5rem);
-    font-weight: 200; 
+    font-weight: 200; /* Ultra thin */
     letter-spacing: 0.15em; 
     line-height: 1;
     color: var(--starlight);
@@ -332,10 +299,11 @@
     50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
   }
 
-  /* Desktop adjustments to keep proportions balanced */
+  /* DESKTOP MEDIA QUERY: Reposition elements for huge screens */
   @media (min-width: 768px) {
-    .eclipse-system { top: 40%; }
-    .text-block { top: 76%; } /* Slides down further on massive screens */
+    .eclipse-system { top: 38%; }
+    .text-block { top: 76%; } /* Push completely away from the giant corona */
+    .scroll-cue { bottom: 4vh; }
   }
 
   /* ============================================
@@ -488,8 +456,6 @@
 
   <div class="sky-parallax-container">
       <div id="skyLightOverlay" class="sky-light-overlay"></div>
-      
-      <!-- LIVING AURORA CANVAS -->
       <canvas id="auroraCanvas" class="aurora-canvas"></canvas>
 
       <div class="parallax-layer layer-background"></div>
@@ -499,16 +465,16 @@
 
   <main class="site-content">
     
-    <!-- RESTORED HTML FLARES - Precise optical physics mapping -->
+    <!-- LENS FLARE SYSTEM: Converted to pure Canvas to defeat Samsung Dark Mode -->
     <div class="flare-system" id="flareSystem">
-        <div class="flare-artifact flare-streak"></div>
-        <div class="flare-artifact flare-burst"></div>
-        <div class="flare-artifact flare-1"></div>
-        <div class="flare-artifact flare-2"></div>
-        <div class="flare-artifact flare-3"></div>
-        <div class="flare-artifact flare-4"></div>
-        <div class="flare-artifact flare-5"></div>
-        <div class="flare-artifact flare-6"></div>
+        <canvas id="flareStreak" class="flare-artifact flare-streak"></canvas>
+        <canvas id="flareBurst" class="flare-artifact flare-burst"></canvas>
+        <canvas id="flare1" class="flare-artifact flare-1"></canvas>
+        <canvas id="flare2" class="flare-artifact flare-2"></canvas>
+        <canvas id="flare3" class="flare-artifact flare-3"></canvas>
+        <canvas id="flare4" class="flare-artifact flare-4"></canvas>
+        <canvas id="flare5" class="flare-artifact flare-5"></canvas>
+        <canvas id="flare6" class="flare-artifact flare-6"></canvas>
     </div>
 
     <section class="hero-wrap" id="heroWrap">
@@ -519,13 +485,14 @@
           <canvas id="moonCanvas" class="moon-canvas"></canvas>
         </div>
         
-        <!-- TEXT BLOCK RESTORED TO PERFECT ABSOLUTE COORDINATES -->
+        <!-- TEXT BLOCK: Absolute Positioned -->
         <div class="text-block">
           <p class="eyebrow">Iceland &middot; 2026</p>
           <h1 class="title">Sarra</h1>
           <p class="tagline">totality, and everything after</p>
         </div>
         
+        <!-- SCROLL CUE: Absolute Positioned -->
         <div class="scroll-cue">
           <span>Scroll</span>
           <div class="line"></div>
@@ -589,6 +556,47 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ============================================
+     DRAW LENS FLARES INTO CANVAS ELEMENTS
+     This solves the Samsung Dark Mode override issue.
+  ============================================ */
+  function buildCanvasFlares() {
+      function drawFlare(id, size, stops, isStreak = false) {
+          const canvas = document.getElementById(id);
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+          
+          if (isStreak) {
+              canvas.width = 3000; 
+              canvas.height = 4;
+              const grad = ctx.createLinearGradient(0, 0, 3000, 0);
+              stops.forEach(s => grad.addColorStop(s[0], s[1]));
+              ctx.fillStyle = grad;
+              ctx.fillRect(0, 0, 3000, 4);
+          } else {
+              canvas.width = size; 
+              canvas.height = size;
+              const c = size / 2;
+              const grad = ctx.createRadialGradient(c, c, 0, c, c, c);
+              stops.forEach(s => grad.addColorStop(s[0], s[1]));
+              ctx.fillStyle = grad;
+              ctx.fillRect(0, 0, size, size);
+          }
+      }
+
+      drawFlare('flareStreak', null, [
+          [0, 'rgba(0,0,0,0)'], [0.4, 'rgba(255,220,180,0.1)'], [0.5, 'rgba(255,255,255,0.9)'], [0.6, 'rgba(255,220,180,0.1)'], [1, 'rgba(0,0,0,0)']
+      ], true);
+
+      drawFlare('flareBurst', 250, [[0, 'rgba(255,255,255,1)'], [0.15, 'rgba(255,200,100,0.6)'], [0.6, 'rgba(0,0,0,0)']]);
+      drawFlare('flare1', 150, [[0.4, 'rgba(0,0,0,0)'], [0.5, 'rgba(190,190,240,0.2)'], [0.6, 'rgba(0,0,0,0)']]);
+      drawFlare('flare2', 300, [[0.45, 'rgba(0,0,0,0)'], [0.5, 'rgba(200,230,200,0.15)'], [0.55, 'rgba(0,0,0,0)']]);
+      drawFlare('flare3', 700, [[0.48, 'rgba(0,0,0,0)'], [0.5, 'rgba(255,50,50,0.1)'], [0.52, 'rgba(0,0,0,0)']]);
+      drawFlare('flare4', 120, [[0.3, 'rgba(0,0,0,0)'], [0.5, 'rgba(50,180,50,0.2)'], [0.7, 'rgba(0,0,0,0)']]);
+      drawFlare('flare5', 80, [[0, 'rgba(200,220,80,0.3)'], [0.6, 'rgba(0,0,0,0)']]);
+      drawFlare('flare6', 40, [[0, 'rgba(150,220,220,0.4)'], [0.5, 'rgba(0,0,0,0)']]);
+  }
+
+  /* ============================================
      CANVAS ECLIPSE GENERATOR
   ============================================ */
   function drawEclipseElements() {
@@ -603,7 +611,6 @@
       const sCy = sSize / 2;
       const sGrad = sCtx.createRadialGradient(sCx, sCy, 0, sCx, sCy, sSize / 2);
 
-      // TIGHTENED CORONA GRADIENT
       sGrad.addColorStop(0, '#ffffff');
       sGrad.addColorStop(0.48, '#ffffff'); 
       sGrad.addColorStop(0.505, '#ffffff'); 
@@ -761,7 +768,6 @@
         }
         frag.appendChild(svg);
       }
-      
       container.appendChild(frag);
     });
   }
@@ -803,7 +809,6 @@
     sTicking = false;
     const scrollY = window.scrollY;
     
-    // Set scroll property for mobile background parallax tracking
     root.style.setProperty('--scroll-y', scrollY);
 
     if (reduceMotion) return; 
@@ -813,7 +818,6 @@
     
     const maxOffset = window.innerWidth <= 640 ? 120 : 250;
     
-    // Moon starts at perfect 0,0 (Absolute Totality)
     let moonX = p * maxOffset; 
     let moonY = p * (maxOffset * 0.3); 
 
@@ -821,7 +825,6 @@
     let bgFlare = 0;
     let auroraOp = 0;
 
-    // Timeline phases
     if (p < 0.15) {
         flareOp = 0;
         auroraOp = 0;
@@ -835,11 +838,8 @@
     
     bgFlare = flareOp * 0.9; 
 
-    // EXACT OPTICAL PHYSICS RESTORED
-    // Tracks the physical position of the sun container relative to the screen center.
-    // As you scroll down, the sun moves UP the screen, making `ly` negative.
-    // A flare with a negative scale factor will therefore travel DOWN the screen.
-    const eclipseSys = document.getElementById('eclipseSystem');
+    // CALCULATE OPTICAL CENTER FOR LENS FLARES
+    const eclipseSys = document.querySelector('.eclipse-system');
     if (eclipseSys) {
       const eclipseRect = eclipseSys.getBoundingClientRect();
       const viewportCenterX = window.innerWidth / 2;
@@ -851,6 +851,7 @@
       const lx = sunCenterX - viewportCenterX;
       const ly = sunCenterY - viewportCenterY;
 
+      // Passing coordinates into CSS triggers the exact flare transform physics
       root.style.setProperty('--lx', lx + 'px');
       root.style.setProperty('--ly', ly + 'px');
     }
@@ -878,10 +879,11 @@
      INITIALIZATION & OBSERVERS
   ============================================ */
   window.addEventListener('DOMContentLoaded', () => {
+    buildCanvasFlares(); // Generate flares on canvases to bypass Dark Mode bug
     drawEclipseElements();
     initAurora();
     buildStarfield();
-    updateEclipse(); // Execute immediately to guarantee perfect layout state on load
+    updateEclipse(); // Set starting totality
   });
 
   const grid = document.getElementById('galleryGrid');
@@ -903,74 +905,4 @@
     } else {
       frame.style.setProperty('--ar', aspects[i % aspects.length]);
       frame.innerHTML = `
-        <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
-          <circle cx="13" cy="13" r="11.5" stroke="#8f8a97" stroke-width="1"/>
-          <circle cx="13" cy="13" r="6" fill="#8f8a97"/>
-        </svg>
-        <span>awaiting</span>`;
-    }
-    grid.appendChild(frame);
-  });
-
-  if (reduceMotion) {
-    document.querySelectorAll('.frame').forEach(f => f.classList.add('visible'));
-  } else {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15 });
-    document.querySelectorAll('.frame').forEach(f => io.observe(f));
-  }
-
-  /* ============================================
-     LIGHTBOX CONTROLLER
-  ============================================ */
-  const lightbox = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lbImg');
-  const lbCaption = document.getElementById('lbCaption');
-  const lbPrev = document.getElementById('lbPrev');
-  const lbNext = document.getElementById('lbNext');
-  let currentIndex = 0;
-
-  function openLightbox(index) {
-    if (usingPlaceholders) return;
-    currentIndex = index;
-    showPhoto();
-    lightbox.classList.add('open');
-    lightbox.setAttribute('aria-hidden', 'false');
-  }
-
-  function showPhoto() {
-    const p = photos[currentIndex];
-    lbImg.src = p.src;
-    lbImg.alt = p.caption || '';
-    lbCaption.textContent = p.caption || '';
-    const multi = photos.length > 1;
-    lbPrev.style.display = multi ? 'block' : 'none';
-    lbNext.style.display = multi ? 'block' : 'none';
-  }
-
-  function closeLightbox() {
-    lightbox.classList.remove('open');
-    lightbox.setAttribute('aria-hidden', 'true');
-  }
-
-  document.getElementById('lbClose').addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-  lbPrev.addEventListener('click', () => { currentIndex = (currentIndex - 1 + photos.length) % photos.length; showPhoto(); });
-  lbNext.addEventListener('click', () => { currentIndex = (currentIndex + 1) % photos.length; showPhoto(); });
-
-  window.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('open')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') lbPrev.click();
-    if (e.key === 'ArrowRight') lbNext.click();
-  });
-
-</script>
-</body>
-</html>
+        <svg width="22" height="22" viewBox="0 0 26 26" fill="n
